@@ -1,15 +1,20 @@
-# Demo UI (prototyping only)
-demo_ui/
+# Flutter/Dart
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+*.iml
+.metadata
+.packages
 
-# SRS documentation (reference only, not source code)
-docs/srs.md
-
-# Claude Code memory & settings
-.claude/
+# Build artifacts
+build/
+dist/
+.gradle/
+.build/
 
 # IDE & Editor
-.vscode/
 .idea/
+.vscode/
 *.swp
 *.swo
 *~
@@ -18,17 +23,21 @@ docs/srs.md
 .DS_Store
 Thumbs.db
 
-# Build artifacts
-build/
-dist/
-.gradle/
-.build/
-
 # Dependencies
 node_modules/
 pubspec.lock
-.packages
 
 # Environment
 .env
 .env.local
+
+# === NilamAI Project-Specific ===
+
+# Demo UI (prototyping only)
+demo_ui/
+
+# SRS documentation (reference only, not source code)
+docs/srs.md
+
+# Claude Code memory & settings
+.claude/

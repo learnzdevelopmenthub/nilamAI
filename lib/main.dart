@@ -3,12 +3,26 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'config/routes.dart';
 import 'config/theme.dart';
+import 'core/logging/logger.dart';
+import 'providers/database_providers.dart';
+import 'services/database/database_service.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  final dbService = DatabaseService.create();
+  try {
+    await dbService.initialize();
+  } catch (e) {
+    AppLogger.error('Database initialization failed', 'main', e);
+  }
+
   runApp(
-    const ProviderScope(
-      child: NilamAIApp(),
+    ProviderScope(
+      overrides: [
+        databaseServiceProvider.overrideWithValue(dbService),
+      ],
+      child: const NilamAIApp(),
     ),
   );
 }

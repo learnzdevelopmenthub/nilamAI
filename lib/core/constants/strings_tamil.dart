@@ -38,4 +38,6 @@ class TamilStrings {
   static const String errorGeneral = 'பிழை ஏற்பட்டது. மீண்டும் முயற்சிக்கவும்.';
   static const String errorMicrophone = 'மைக்ரோஃபோன் அணுக முடியவில்லை';
   static const String errorNetwork = 'இணைய இணைப்பு இல்லை';
+  static const String errorDatabase = 'தரவுத்தள பிழை. மீண்டும் முயற்சிக்கவும்.';
+  static const String errorDatabaseInit = 'தரவுத்தளத்தை துவக்க முடியவில்லை';
 }

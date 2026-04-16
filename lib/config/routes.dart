@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../core/constants/strings_tamil.dart';
+import '../screens/recording/recording_screen.dart';
 
 final GoRouter appRouter = GoRouter(
   initialLocation: '/',
@@ -11,6 +12,13 @@ final GoRouter appRouter = GoRouter(
       name: 'home',
       builder: (BuildContext context, GoRouterState state) {
         return const HomeScreen();
+      },
+    ),
+    GoRoute(
+      path: '/record',
+      name: 'record',
+      builder: (BuildContext context, GoRouterState state) {
+        return const RecordingScreen();
       },
     ),
   ],
@@ -53,6 +61,11 @@ class HomeScreen extends StatelessWidget {
             ),
           ],
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => context.push('/record'),
+        tooltip: TamilStrings.record,
+        child: const Icon(Icons.mic),
       ),
     );
   }

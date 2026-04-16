@@ -34,10 +34,33 @@ class TamilStrings {
   static const String processing = 'செயலாக்குகிறது...';
   static const String ready = 'தயார்';
 
+  // -- Recording --
+  static const String recordingTitle = 'உங்கள் கேள்வியைக் கேளுங்கள்';
+  static const String tapToRecord = 'பதிவு செய்ய தட்டுங்கள்';
+  static const String recordingActive = 'பதி���ு செய்கிறது...';
+  static const String recordingComplete = 'பதி��ு முடிந்தது';
+
+  // -- Permissions --
+  static const String micPermissionNeeded = 'மைக்ரோஃபோன் அனுமதி தேவை';
+  static const String micPermissionExplain =
+      'உங்கள் குரலை பதிவு செய்ய மைக்ரோஃபோன் அனுமதி அவசியம்';
+  static const String openSettings = 'அமைப்புகளைத் திற';
+
+  // -- Quality warnings --
+  static const String warningTooQuiet =
+      'சத்தம் குறைவாக உள்ளது. சற்று சத்தமாகப் ப���சுங்கள்';
+  static const String warningClipping =
+      'சத்தம் அதிகமாக உள்��து. சற்று மெதுவாகப் பேசுங்கள்';
+
   // -- Errors --
   static const String errorGeneral = 'பிழை ஏற்பட்டது. மீண்டும் முயற்சிக்கவும்.';
   static const String errorMicrophone = 'மைக்ரோஃபோன் அணுக முடியவில்லை';
   static const String errorNetwork = 'இணைய இணைப்பு இல்லை';
+  static const String errorCodecUnsupported =
+      'இந்த சாதனத்தில் ஒலி பதிவு ஆதரிக்கப்படவில்லை';
+  static const String errorRecordingFailed =
+      'பதிவு தோல்வி. மீண்டும் முயற்சிக்கவும்';
+  static const String errorMaxDuration = 'அதிகபட்ச நேரம் எட்டப்பட்டத���';
   static const String errorDatabase = 'தரவுத்தள பிழை. மீண்டும் முயற்சிக்கவும்.';
   static const String errorDatabaseInit = 'தரவுத்தளத்தை துவக்க முடியவில்லை';
 }

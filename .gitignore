@@ -1,0 +1,34 @@
+# Demo UI (prototyping only)
+demo_ui/
+
+# SRS documentation (reference only, not source code)
+docs/srs.md
+
+# Claude Code memory & settings
+.claude/
+
+# IDE & Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build artifacts
+build/
+dist/
+.gradle/
+.build/
+
+# Dependencies
+node_modules/
+pubspec.lock
+.packages
+
+# Environment
+.env
+.env.local

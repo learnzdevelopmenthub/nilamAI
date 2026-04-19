@@ -5,9 +5,9 @@ import '../core/exceptions/app_exception.dart';
 import '../core/logging/logger.dart';
 import '../services/llm/gemini_generator.dart';
 import '../services/llm/gemma_generator.dart';
-import '../services/llm/gemma_model_loader.dart';
 import '../services/llm/gemma_service.dart';
 import '../services/llm/llm_constants.dart';
+import '../services/llm/model_loader.dart';
 import '../services/llm/noop_model_loader.dart';
 
 // -----------------------------------------------------------------------------
@@ -48,15 +48,12 @@ class GemmaError extends GemmaState {
 // -----------------------------------------------------------------------------
 
 /// API-mode loader — returns an empty path; the remote [GeminiGenerator]
-/// ignores it. Swap back to [GemmaModelLoader] when reviving on-device mode.
-final gemmaModelLoaderProvider = Provider<GemmaModelLoader>((ref) {
+/// ignores it.
+final gemmaModelLoaderProvider = Provider<ModelLoader>((ref) {
   return NoopModelLoader();
 });
 
-/// Production generator. Currently Gemini REST because the 2.58 GB
-/// `.litertlm` model OOM-kills 4 GB devices (see Phase 6 post-mortem).
-/// Override with [OllamaGenerator] for dev, [FlutterGemmaGenerator] for
-/// on-device hybrid mode, or a fake for tests.
+/// Production generator: Gemini REST.
 final gemmaGeneratorProvider = Provider<GemmaGenerator>((ref) {
   if (LlmConstants.geminiApiKey.isEmpty) {
     throw StateError(

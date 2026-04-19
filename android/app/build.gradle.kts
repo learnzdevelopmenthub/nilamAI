@@ -35,9 +35,8 @@ android {
             // TODO: Add your own signing config for the release build.
             // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig = signingConfigs.getByName("debug")
-            // flutter_gemma uses reflection into MediaPipe proto classes; R8 can't
-            // see those references statically and strips them. Disabling shrinking
-            // avoids maintaining a long list of -keep/-dontwarn rules.
+            // R8 stays off until we audit proguard rules for record / whisper_ggml /
+            // flutter_tts / sqflite — plugins that use JNI + reflection.
             isMinifyEnabled = false
             isShrinkResources = false
         }

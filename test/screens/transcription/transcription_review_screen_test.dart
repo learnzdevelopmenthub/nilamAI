@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import 'package:nilam_ai/config/theme.dart';
 import 'package:nilam_ai/core/constants/strings_tamil.dart';
 import 'package:nilam_ai/providers/database_providers.dart';
+import 'package:nilam_ai/providers/llm_providers.dart';
 import 'package:nilam_ai/screens/transcription/transcription_review_screen.dart';
 import 'package:nilam_ai/services/database/database_service.dart';
 import 'package:nilam_ai/services/stt/stt_constants.dart';
@@ -60,16 +61,38 @@ GoRouter _router({
 Widget _app({
   required DatabaseService db,
   required GoRouter router,
+  _FakeGemmaNotifier? gemma,
 }) {
   return ProviderScope(
     overrides: [
       databaseServiceProvider.overrideWithValue(db),
+      // Always override — prevents the real FlutterGemmaGenerator from trying
+      // to touch native code during widget tests.
+      gemmaNotifierProvider.overrideWith(() => gemma ?? _FakeGemmaNotifier()),
     ],
     child: MaterialApp.router(
       theme: NilamTheme.lightTheme,
       routerConfig: router,
     ),
   );
+}
+
+/// Test double for [GemmaNotifier]: records [generate] invocations without
+/// hitting the real LLM service.
+class _FakeGemmaNotifier extends GemmaNotifier {
+  int generateCalls = 0;
+  String? lastQuery;
+  String? lastCropType;
+
+  @override
+  GemmaState build() => const GemmaIdle();
+
+  @override
+  Future<void> generate({required String query, String? cropType}) async {
+    generateCalls += 1;
+    lastQuery = query;
+    lastCropType = cropType;
+  }
 }
 
 /// `pumpAndSettle` hangs because of the blinking [TextField] cursor. Pump a
@@ -250,6 +273,35 @@ void main() {
       final user = await tester.runAsync(() => db.userProfileDao.getCurrent());
       expect(user, isNotNull);
       expect(user!.phoneNumber, equals('local_user_default'));
+    });
+
+    testWidgets('confirm fires gemmaNotifier.generate with transcription text',
+        (tester) async {
+      final visited = <String>[];
+      final router = _router(
+        audioPath: audio.path,
+        initialText: 'நெல் நோய்',
+        visited: visited,
+      );
+      final fake = _FakeGemmaNotifier();
+      await tester.pumpWidget(_app(db: db, router: router, gemma: fake));
+      await _pumpFrames(tester);
+
+      await tester.tap(find.text(TamilStrings.confirm));
+      // `_confirm` has multiple awaits that resolve in the real zone (DAO
+      // I/O). Alternate runAsync+pump so the handler's continuations drain.
+      for (var i = 0; i < 5; i++) {
+        await tester.runAsync(() async {
+          await Future<void>.delayed(const Duration(milliseconds: 50));
+        });
+        await tester.pump();
+      }
+
+      expect(fake.generateCalls, equals(1));
+      expect(fake.lastQuery, equals('நெல் நோய்'));
+      // Bootstrap profile has no crop set, so we expect null.
+      expect(fake.lastCropType, isNull);
+      expect(visited, contains('/response'));
     });
 
     testWidgets('retake deletes the audio file and navigates to /record',

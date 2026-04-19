@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -6,15 +8,18 @@ import '../../config/theme.dart';
 import '../../core/constants/strings_tamil.dart';
 import '../../core/logging/logger.dart';
 import '../../providers/database_providers.dart';
+import '../../providers/llm_providers.dart';
 import '../../services/database/models/query_history.dart';
+import '../../services/llm/gemma_service.dart';
 
 const String _ratingThumbsUp = 'thumbs_up';
 const String _ratingThumbsDown = 'thumbs_down';
 
-/// Displays the saved query, the (eventual) AI response, and rating controls.
+/// Displays the saved query, the AI response, and rating controls.
 ///
-/// Audio playback is stubbed (Phase 7, see #16). Gemma response field stays
-/// null until Phase 6 wires the LLM (#15) — placeholder in the meantime.
+/// Audio playback is stubbed (Phase 7, see #16). The AI response area watches
+/// [gemmaNotifierProvider] for loading/complete/error states and persists the
+/// result to [QueryHistory] via [queryHistoryDaoProvider] on completion.
 class ResponseScreen extends ConsumerWidget {
   const ResponseScreen({required this.queryId, super.key});
 
@@ -59,6 +64,21 @@ class _ResponseBodyState extends ConsumerState<_ResponseBody> {
   static const _tag = 'ResponseScreen';
   bool _saving = false;
 
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      // Clear any stale terminal state left behind by a prior query. An
+      // in-progress LoadingModel/Generating is preserved so a fresh kickoff
+      // from TranscriptionReview still drives the UI.
+      final state = ref.read(gemmaNotifierProvider);
+      if (state is GemmaComplete || state is GemmaError) {
+        ref.read(gemmaNotifierProvider.notifier).reset();
+      }
+    });
+  }
+
   Future<void> _setRating(String tappedRating) async {
     if (_saving) return;
     final current = widget.query.userRating;
@@ -100,12 +120,52 @@ class _ResponseBodyState extends ConsumerState<_ResponseBody> {
     }
   }
 
+  Future<void> _persistGemma(GemmaResponse response) async {
+    try {
+      final dao = ref.read(queryHistoryDaoProvider);
+      await dao.update(
+        widget.query.copyWith(
+          gemmaPrompt: response.prompt,
+          gemmaResponse: response.text,
+          gemmaLatencyMs: response.latencyMs,
+          updatedAt: DateTime.now(),
+        ),
+      );
+      ref.invalidate(queryByIdProvider(widget.query.id));
+    } catch (e, st) {
+      AppLogger.error('Failed to persist Gemma response', _tag, e, st);
+    }
+  }
+
+  void _regenerate() {
+    final notifier = ref.read(gemmaNotifierProvider.notifier);
+    notifier.reset();
+    unawaited(() async {
+      final profile = await ref.read(userProfileDaoProvider).getCurrent();
+      await notifier.generate(
+        query: widget.query.transcription,
+        cropType: profile?.primaryCrop,
+      );
+    }());
+  }
+
   @override
   Widget build(BuildContext context) {
+    ref.listen<GemmaState>(gemmaNotifierProvider, (_, next) async {
+      if (next is! GemmaComplete) return;
+      if (widget.query.gemmaResponse != null &&
+          widget.query.gemmaResponse!.isNotEmpty) {
+        return;
+      }
+      await _persistGemma(next.response);
+      if (!mounted) return;
+      ref.read(gemmaNotifierProvider.notifier).reset();
+    });
+
     final theme = Theme.of(context);
     final query = widget.query;
-    final response = query.gemmaResponse;
-    final hasResponse = response != null && response.isNotEmpty;
+    final stored = query.gemmaResponse;
+    final hasStored = stored != null && stored.isNotEmpty;
     final rating = query.userRating;
 
     return SingleChildScrollView(
@@ -148,18 +208,13 @@ class _ResponseBodyState extends ConsumerState<_ResponseBody> {
                     ),
                   ),
                   const SizedBox(height: 8),
-                  // TODO(#15): once Phase 6 (#6) wires Gemma, the placeholder
-                  // branch goes away — `hasResponse` should always be true.
-                  Text(
-                    hasResponse ? response : TamilStrings.responsePlaceholder,
-                    style: theme.textTheme.bodyLarge?.copyWith(
-                      fontStyle:
-                          hasResponse ? FontStyle.normal : FontStyle.italic,
-                      color: hasResponse
-                          ? theme.colorScheme.onSurface
-                          : theme.colorScheme.onSurfaceVariant,
-                    ),
-                  ),
+                  if (hasStored)
+                    Text(
+                      stored,
+                      style: theme.textTheme.bodyLarge,
+                    )
+                  else
+                    _GemmaStateView(onRetry: _regenerate),
                 ],
               ),
             ),
@@ -201,6 +256,152 @@ class _ResponseBodyState extends ConsumerState<_ResponseBody> {
           ),
         ],
       ),
+    );
+  }
+}
+
+/// Renders the current Gemma pipeline state inside the AI-response card.
+///
+/// Only used when [QueryHistory.gemmaResponse] is null/empty — stored DB
+/// responses take precedence over the notifier state (see
+/// [_ResponseBodyState.build]).
+class _GemmaStateView extends ConsumerWidget {
+  const _GemmaStateView({required this.onRetry});
+
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final state = ref.watch(gemmaNotifierProvider);
+    final theme = Theme.of(context);
+    return switch (state) {
+      GemmaIdle() => _GemmaIdle(onGenerate: onRetry),
+      GemmaLoadingModel() =>
+        const _GemmaLoading(label: TamilStrings.gemmaLoadingModel),
+      GemmaGenerating() =>
+        const _GemmaLoading(label: TamilStrings.gemmaGenerating),
+      GemmaComplete(:final response) => Text(
+          response.text,
+          style: theme.textTheme.bodyLarge,
+        ),
+      GemmaError(:final code, :final message) =>
+        _GemmaError(code: code, message: message, onRetry: onRetry),
+    };
+  }
+}
+
+/// Idle view for rows without a stored response. Used for history entries
+/// created before Gemma was wired up — the user taps the button to trigger
+/// generation on-demand rather than auto-running it on open.
+class _GemmaIdle extends StatelessWidget {
+  const _GemmaIdle({required this.onGenerate});
+  final VoidCallback onGenerate;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          TamilStrings.responsePlaceholder,
+          style: theme.textTheme.bodyLarge?.copyWith(
+            fontStyle: FontStyle.italic,
+            color: theme.colorScheme.onSurfaceVariant,
+          ),
+        ),
+        const SizedBox(height: 12),
+        Align(
+          alignment: Alignment.centerLeft,
+          child: FilledButton.tonalIcon(
+            onPressed: onGenerate,
+            icon: const Icon(Icons.auto_awesome),
+            label: const Text(TamilStrings.gemmaGenerateAnswer),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _GemmaLoading extends StatelessWidget {
+  const _GemmaLoading({required this.label});
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        const SizedBox(
+          width: 28,
+          height: 28,
+          child: CircularProgressIndicator(
+            strokeWidth: 3,
+            color: NilamTheme.primaryGreen,
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Text(
+            label,
+            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _GemmaError extends StatelessWidget {
+  const _GemmaError({
+    required this.code,
+    required this.message,
+    required this.onRetry,
+  });
+
+  final String code;
+  final String message;
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            const Icon(Icons.error_outline, color: NilamTheme.redPrimary),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                TamilStrings.gemmaError,
+                style: theme.textTheme.bodyLarge?.copyWith(
+                  color: NilamTheme.redPrimary,
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 4),
+        Text(
+          '[$code] $message',
+          style: theme.textTheme.bodySmall?.copyWith(
+            color: theme.colorScheme.onSurfaceVariant,
+          ),
+        ),
+        const SizedBox(height: 12),
+        Align(
+          alignment: Alignment.centerLeft,
+          child: OutlinedButton.icon(
+            onPressed: onRetry,
+            icon: const Icon(Icons.refresh),
+            label: const Text(TamilStrings.retry),
+          ),
+        ),
+      ],
     );
   }
 }

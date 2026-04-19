@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -9,6 +10,7 @@ import '../../config/theme.dart';
 import '../../core/constants/strings_tamil.dart';
 import '../../core/logging/logger.dart';
 import '../../providers/database_providers.dart';
+import '../../providers/llm_providers.dart';
 import '../../providers/user_providers.dart';
 import '../../services/database/models/query_history.dart';
 import '../../services/stt/stt_constants.dart';
@@ -90,9 +92,14 @@ class _TranscriptionReviewScreenState
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text(TamilStrings.transcriptionSaved)),
       );
-      // TODO(#15): Phase 6 (#6) should kick off Gemma here (or before nav)
-      // and update QueryHistory.gemmaResponse so the Response screen flips
-      // from placeholder to the real answer.
+
+      // MVP bootstrap profile has no primaryCrop set. Wire the cropType
+      // through here once Settings persists it.
+      final gemma = ref.read(gemmaNotifierProvider.notifier);
+      gemma.reset();
+      unawaited(gemma.generate(query: text, cropType: null));
+
+      if (!mounted) return;
       context.go('/response/${history.id}');
     } catch (e, st) {
       AppLogger.error('Failed to save query history', _tag, e, st);

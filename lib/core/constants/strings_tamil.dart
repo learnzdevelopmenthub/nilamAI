@@ -63,4 +63,24 @@ class TamilStrings {
   static const String errorMaxDuration = 'அதிகபட்ச நேரம் எட்டப்பட்டத���';
   static const String errorDatabase = 'தரவுத்தள பிழை. மீண்டும் முயற்சிக்கவும்.';
   static const String errorDatabaseInit = 'தரவுத்தளத்தை துவக்க முடியவில்லை';
+
+  // -- STT (Speech-to-Text) --
+  static const String sttTranscribing = 'உரையாக மாற்றுகிறது...';
+  static const String sttModelLoading = 'மாதிரி ஏற்றப்படுகிறது...';
+
+  // -- Transcription review --
+  static const String reviewTitle = 'பதிவு செய்த உரை';
+  static const String reviewInstructions = 'தவறு இருந்தால் திருத்தவும்';
+  static const String confirm = 'உறுதிசெய்';
+  static const String retake = 'மீண்டும் பதிவு செய்';
+  static const String transcriptionEmpty = 'எந்த உரையும் கண்டறியப்படவில்லை';
+  static const String transcriptionSaved = 'சேமிக்கப்பட்டது';
+
+  // -- STT errors (E006/E007/E008) --
+  static const String errorSttModelMissing =
+      'பேச்சு அறிதல் மாதிரி கிடைக்கவில்லை';
+  static const String errorSttFailed =
+      'உரை மாற்றம் தோல்வி. மீண்டும் முயற்சிக்கவும்';
+  static const String errorSttLowConfidence =
+      'உரை தெளிவாக இல்லை. திருத்தவும்';
 }

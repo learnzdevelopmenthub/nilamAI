@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../config/theme.dart';
 import '../../../core/constants/strings_tamil.dart';
@@ -17,7 +18,8 @@ class RecordingControls extends ConsumerWidget {
     return switch (recordingState) {
       RecordingIdle() => _buildRecordButton(notifier),
       RecordingActive() => _buildActiveControls(notifier),
-      RecordingComplete() => _buildCompleteControls(notifier),
+      RecordingComplete(:final filePath) =>
+        _buildCompleteControls(context, notifier, filePath),
       RecordingError(:final message) => _buildErrorControls(notifier, message),
     };
   }
@@ -77,14 +79,35 @@ class RecordingControls extends ConsumerWidget {
     );
   }
 
-  Widget _buildCompleteControls(RecordingNotifier notifier) {
-    return ElevatedButton.icon(
-      onPressed: notifier.reset,
-      icon: const Icon(Icons.mic),
-      label: const Text(TamilStrings.record),
-      style: ElevatedButton.styleFrom(
-        minimumSize: const Size(160, 48),
-      ),
+  Widget _buildCompleteControls(
+    BuildContext context,
+    RecordingNotifier notifier,
+    String filePath,
+  ) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        ElevatedButton.icon(
+          onPressed: () {
+            final uri = Uri(
+              path: '/transcribe',
+              queryParameters: {'audioPath': filePath},
+            );
+            context.push(uri.toString());
+          },
+          icon: const Icon(Icons.auto_awesome),
+          label: const Text(TamilStrings.sttTranscribing),
+          style: ElevatedButton.styleFrom(
+            minimumSize: const Size(200, 56),
+          ),
+        ),
+        const SizedBox(height: 12),
+        TextButton.icon(
+          onPressed: notifier.reset,
+          icon: const Icon(Icons.mic),
+          label: const Text(TamilStrings.retake),
+        ),
+      ],
     );
   }
 

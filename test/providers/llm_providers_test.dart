@@ -65,6 +65,7 @@ void main() {
           gemmaGeneratorProvider.overrideWithValue(
             _FakeGenerator(text: 'சுத்தமான பதில்.'),
           ),
+          connectivityCheckProvider.overrideWithValue(null),
         ],
       );
 
@@ -96,6 +97,7 @@ void main() {
           gemmaModelLoaderProvider
               .overrideWithValue(_FakeLoader(shouldThrow: true)),
           gemmaGeneratorProvider.overrideWithValue(_FakeGenerator()),
+          connectivityCheckProvider.overrideWithValue(null),
         ],
       );
 
@@ -113,6 +115,7 @@ void main() {
         overrides: [
           gemmaModelLoaderProvider.overrideWithValue(_FakeLoader()),
           gemmaGeneratorProvider.overrideWithValue(_FakeGenerator()),
+          connectivityCheckProvider.overrideWithValue(null),
         ],
       );
 
@@ -130,6 +133,7 @@ void main() {
         overrides: [
           gemmaModelLoaderProvider.overrideWithValue(_FakeLoader()),
           gemmaGeneratorProvider.overrideWithValue(_FakeGenerator()),
+          connectivityCheckProvider.overrideWithValue(null),
         ],
       );
 

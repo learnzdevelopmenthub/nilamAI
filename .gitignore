@@ -41,3 +41,9 @@ docs/srs.md
 
 # Claude Code memory & settings
 .claude/
+
+# Whisper model files (fetched via scripts/fetch_model.ps1 or .sh, too large for git)
+assets/models/*.bin
+
+# Flutter crash reports
+flutter_*.log

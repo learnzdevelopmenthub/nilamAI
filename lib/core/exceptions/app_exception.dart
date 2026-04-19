@@ -2,10 +2,13 @@
 ///
 /// Error codes follow the SRS convention:
 /// - E001: Microphone errors
-/// - E002: STT errors
+/// - E002: STT errors (generic)
 /// - E003: LLM errors
 /// - E004: TTS errors
 /// - E005: Database errors
+/// - E006: Whisper model not loaded
+/// - E007: Transcription failed
+/// - E008: Low confidence transcription
 sealed class AppException implements Exception {
   const AppException({
     required this.code,
@@ -32,7 +35,28 @@ class SttException extends AppException {
   const SttException({
     required super.message,
     super.originalError,
-  }) : super(code: 'E002');
+    super.code = 'E002',
+  });
+
+  SttException.modelNotLoaded({Object? originalError})
+      : this(
+          code: 'E006',
+          message: 'Whisper model not loaded',
+          originalError: originalError,
+        );
+
+  SttException.transcriptionFailed(String detail, {Object? originalError})
+      : this(
+          code: 'E007',
+          message: 'Transcription failed: $detail',
+          originalError: originalError,
+        );
+
+  SttException.lowConfidence(double score)
+      : this(
+          code: 'E008',
+          message: 'Low confidence: ${score.toStringAsFixed(2)}',
+        );
 }
 
 class LlmException extends AppException {

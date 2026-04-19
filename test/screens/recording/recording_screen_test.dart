@@ -84,7 +84,8 @@ void main() {
       expect(find.text('0:45 / 2:00'), findsOneWidget);
     });
 
-    testWidgets('shows complete state with record button', (tester) async {
+    testWidgets('shows complete state with transcribe and retake buttons',
+        (tester) async {
       await tester.pumpWidget(_buildTestApp(
         const RecordingComplete(
           filePath: '/test/audio.wav',
@@ -94,7 +95,9 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text(TamilStrings.recordingComplete), findsOneWidget);
-      expect(find.text(TamilStrings.record), findsOneWidget);
+      // Phase 4: complete state hands off to the transcription flow.
+      expect(find.text(TamilStrings.sttTranscribing), findsOneWidget);
+      expect(find.text(TamilStrings.retake), findsOneWidget);
     });
 
     testWidgets('shows quality warning when present', (tester) async {

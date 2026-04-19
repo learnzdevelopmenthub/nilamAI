@@ -3,6 +3,8 @@ import 'package:go_router/go_router.dart';
 
 import '../core/constants/strings_tamil.dart';
 import '../screens/recording/recording_screen.dart';
+import '../screens/transcription/transcribing_screen.dart';
+import '../screens/transcription/transcription_review_screen.dart';
 
 final GoRouter appRouter = GoRouter(
   initialLocation: '/',
@@ -19,6 +21,26 @@ final GoRouter appRouter = GoRouter(
       name: 'record',
       builder: (BuildContext context, GoRouterState state) {
         return const RecordingScreen();
+      },
+    ),
+    GoRoute(
+      path: '/transcribe',
+      name: 'transcribe',
+      builder: (BuildContext context, GoRouterState state) {
+        final audioPath = state.uri.queryParameters['audioPath'] ?? '';
+        return TranscribingScreen(audioPath: audioPath);
+      },
+    ),
+    GoRoute(
+      path: '/review',
+      name: 'review',
+      builder: (BuildContext context, GoRouterState state) {
+        final audioPath = state.uri.queryParameters['audioPath'] ?? '';
+        final initialText = state.uri.queryParameters['text'] ?? '';
+        return TranscriptionReviewScreen(
+          audioPath: audioPath,
+          initialText: initialText,
+        );
       },
     ),
   ],

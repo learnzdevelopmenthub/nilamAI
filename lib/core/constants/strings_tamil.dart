@@ -83,4 +83,44 @@ class TamilStrings {
       'உரை மாற்றம் தோல்வி. மீண்டும் முயற்சிக்கவும்';
   static const String errorSttLowConfidence =
       'உரை தெளிவாக இல்லை. திருத்தவும்';
+
+  // -- Home --
+  static const String homeTitle = 'நிலம்AI';
+  static const String recentQuestions = 'சமீபத்திய கேள்விகள்';
+  static const String noRecentQuestions = 'இன்னும் கேள்விகள் இல்லை';
+  static const String askQuestionCta = '🎤 கேள்வி கேளுங்கள்';
+
+  // -- Response --
+  static const String responseTitle = 'பதில்';
+  static const String yourQuestion = 'உங்கள் கேள்வி';
+  static const String aiResponse = 'AI பதில்';
+  static const String responsePlaceholder = '🌾 AI பதில் விரைவில் வரும்...';
+  static const String audioComingSoon = '🔊 விரைவில் வரும்';
+  static const String helpful = '👍 பயனுள்ளது';
+  static const String notHelpful = '👎 பயனில்லை';
+  static const String ratingSaved = 'மதிப்பீடு சேமிக்கப்பட்டது';
+  static const String goHome = '🔙 முகப்பு';
+  static const String playSpeed = 'வேகம்';
+  static const String queryNotFound = 'கேள்வி கிடைக்கவில்லை';
+
+  // -- History --
+  static const String historyTitle = 'வரலாறு';
+  static const String searchHint = 'தேடுக...';
+  static const String historyEmpty = '📜 இன்னும் கேள்விகள் இல்லை';
+  static const String deleteConfirmTitle = 'நீக்க வேண்டுமா?';
+  static const String deleteConfirmMessage =
+      'இந்த கேள்வியை நிரந்தரமாக நீக்க விரும்புகிறீர்களா?';
+  static const String deleted = 'நீக்கப்பட்டது';
+
+  // -- Settings --
+  static const String settingsTitle = 'அமைப்புகள்';
+  static const String ttsSpeedLabel = 'குரல் வேகம்';
+  static const String notificationsLabel = 'அறிவிப்புகள்';
+  static const String clearHistoryLabel = '🗑️ வரலாற்றை அழி';
+  static const String clearHistoryConfirmTitle = 'வரலாற்றை அழிக்க வேண்டுமா?';
+  static const String clearHistoryConfirmMessage =
+      'அனைத்து கேள்விகளும் நிரந்தரமாக நீக்கப்படும்.';
+  static const String historyCleared = 'வரலாறு அழிக்கப்பட்டது';
+  static const String aboutLabel = 'பற்றி';
+  static const String versionLabel = 'பதிப்பு';
 }

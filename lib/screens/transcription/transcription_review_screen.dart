@@ -9,9 +9,8 @@ import '../../config/theme.dart';
 import '../../core/constants/strings_tamil.dart';
 import '../../core/logging/logger.dart';
 import '../../providers/database_providers.dart';
-import '../../services/database/daos/user_profile_dao.dart';
+import '../../providers/user_providers.dart';
 import '../../services/database/models/query_history.dart';
-import '../../services/database/models/user_profile.dart';
 import '../../services/stt/stt_constants.dart';
 
 /// Editable review of the Whisper transcription.
@@ -36,7 +35,6 @@ class TranscriptionReviewScreen extends ConsumerStatefulWidget {
 class _TranscriptionReviewScreenState
     extends ConsumerState<TranscriptionReviewScreen> {
   static const _tag = 'TranscriptionReviewScreen';
-  static const _localUserPhoneHash = 'local_user_default';
 
   late final TextEditingController _controller;
   late final String _originalText;
@@ -64,10 +62,9 @@ class _TranscriptionReviewScreenState
     setState(() => _saving = true);
 
     try {
-      final userProfileDao = ref.read(userProfileDaoProvider);
       final queryHistoryDao = ref.read(queryHistoryDaoProvider);
 
-      final userId = await _ensureLocalUser(userProfileDao);
+      final userId = await ref.read(currentUserIdProvider.future);
       final now = DateTime.now();
       final confidence = text == _originalText
           ? SttConstants.confidenceUnedited
@@ -93,7 +90,10 @@ class _TranscriptionReviewScreenState
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text(TamilStrings.transcriptionSaved)),
       );
-      context.go('/');
+      // TODO(#15): Phase 6 (#6) should kick off Gemma here (or before nav)
+      // and update QueryHistory.gemmaResponse so the Response screen flips
+      // from placeholder to the real answer.
+      context.go('/response/${history.id}');
     } catch (e, st) {
       AppLogger.error('Failed to save query history', _tag, e, st);
       if (!mounted) return;
@@ -102,22 +102,6 @@ class _TranscriptionReviewScreenState
         SnackBar(content: Text(TamilStrings.errorDatabase)),
       );
     }
-  }
-
-  Future<String> _ensureLocalUser(UserProfileDao dao) async {
-    final existing = await dao.getCurrent();
-    if (existing != null) return existing.id;
-
-    final now = DateTime.now();
-    final profile = UserProfile(
-      id: const Uuid().v4(),
-      phoneNumber: _localUserPhoneHash,
-      createdAt: now,
-      updatedAt: now,
-    );
-    await dao.insert(profile);
-    AppLogger.info('Bootstrapped local user ${profile.id}', _tag);
-    return profile.id;
   }
 
   Future<void> _retake() async {

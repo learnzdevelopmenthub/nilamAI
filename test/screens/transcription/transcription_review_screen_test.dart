@@ -46,6 +46,13 @@ GoRouter _router({
           return const Scaffold(body: Text('RECORD_SCREEN'));
         },
       ),
+      GoRoute(
+        path: '/response/:queryId',
+        builder: (context, state) {
+          visited.add('/response');
+          return const Scaffold(body: Text('RESPONSE_SCREEN'));
+        },
+      ),
     ],
   );
 }

@@ -45,9 +45,6 @@ docs/srs.md
 # Whisper model files (fetched via scripts/fetch_model.ps1 or .sh, too large for git)
 assets/models/*.bin
 
-# Gemma LLM model files (fetched via scripts/fetch_gemma_model.ps1 or .sh, too large for git)
-assets/models/*.litertlm
-
 # Flutter crash reports
 flutter_*.log
 

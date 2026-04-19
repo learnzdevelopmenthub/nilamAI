@@ -5,8 +5,8 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import '../../core/exceptions/app_exception.dart';
 import '../../core/logging/logger.dart';
 import 'gemma_generator.dart';
-import 'gemma_model_loader.dart';
 import 'llm_constants.dart';
+import 'model_loader.dart';
 import 'prompt_builder.dart';
 import 'response_post_processor.dart';
 
@@ -45,7 +45,7 @@ class GemmaResponse {
 /// provider. Keeps this service unit-testable without sqflite.
 class GemmaService {
   GemmaService({
-    required GemmaModelLoader loader,
+    required ModelLoader loader,
     required GemmaGenerator generator,
     ConnectivityCheck? connectivityCheck,
   })  : _loader = loader,
@@ -54,7 +54,7 @@ class GemmaService {
 
   static const _tag = 'GemmaService';
 
-  final GemmaModelLoader _loader;
+  final ModelLoader _loader;
   final GemmaGenerator _generator;
   final ConnectivityCheck? _connectivityCheck;
 

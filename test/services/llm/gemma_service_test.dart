@@ -1,12 +1,9 @@
-import 'dart:io';
-
-import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:nilam_ai/core/exceptions/app_exception.dart';
 import 'package:nilam_ai/services/llm/gemma_generator.dart';
-import 'package:nilam_ai/services/llm/gemma_model_loader.dart';
 import 'package:nilam_ai/services/llm/gemma_service.dart';
 import 'package:nilam_ai/services/llm/llm_constants.dart';
+import 'package:nilam_ai/services/llm/model_loader.dart';
 
 class _FakeGenerator implements GemmaGenerator {
   _FakeGenerator({
@@ -47,9 +44,8 @@ class _FakeGenerator implements GemmaGenerator {
   }
 }
 
-class _FakeLoader extends GemmaModelLoader {
-  _FakeLoader({this.path = '/fake/model.litertlm', this.error})
-      : super(assetBundle: _EmptyBundle(), appDirProvider: _noop);
+class _FakeLoader implements ModelLoader {
+  _FakeLoader({this.path = '/fake/model.path', this.error});
 
   final String path;
   final Object? error;
@@ -64,16 +60,6 @@ class _FakeLoader extends GemmaModelLoader {
     return path;
   }
 }
-
-class _EmptyBundle extends CachingAssetBundle {
-  @override
-  Future<ByteData> load(String key) async => ByteData(0);
-
-  @override
-  Future<String> loadString(String key, {bool cache = true}) async => '';
-}
-
-Future<Directory> _noop() async => Directory.systemTemp;
 
 void main() {
   group('GemmaService.generate — happy path', () {

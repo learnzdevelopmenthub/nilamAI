@@ -66,8 +66,6 @@ Widget _app({
   return ProviderScope(
     overrides: [
       databaseServiceProvider.overrideWithValue(db),
-      // Always override — prevents the real FlutterGemmaGenerator from trying
-      // to touch native code during widget tests.
       gemmaNotifierProvider.overrideWith(() => gemma ?? _FakeGemmaNotifier()),
     ],
     child: MaterialApp.router(

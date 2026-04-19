@@ -1,12 +1,9 @@
-import 'dart:io';
-
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:nilam_ai/core/exceptions/app_exception.dart';
 import 'package:nilam_ai/providers/llm_providers.dart';
 import 'package:nilam_ai/services/llm/gemma_generator.dart';
-import 'package:nilam_ai/services/llm/gemma_model_loader.dart';
+import 'package:nilam_ai/services/llm/model_loader.dart';
 
 class _FakeGenerator implements GemmaGenerator {
   _FakeGenerator({this.text = 'தமிழ் பதில்.'});
@@ -24,28 +21,17 @@ class _FakeGenerator implements GemmaGenerator {
   }
 }
 
-class _FakeLoader extends GemmaModelLoader {
-  _FakeLoader({this.shouldThrow = false})
-      : super(assetBundle: _EmptyBundle(), appDirProvider: _tempDir);
+class _FakeLoader implements ModelLoader {
+  _FakeLoader({this.shouldThrow = false});
 
   final bool shouldThrow;
 
   @override
   Future<String> ensureModelAvailable() async {
     if (shouldThrow) throw LlmException.modelNotLoaded();
-    return '/fake/gemma.litertlm';
+    return '/fake/model.path';
   }
 }
-
-class _EmptyBundle extends CachingAssetBundle {
-  @override
-  Future<ByteData> load(String key) async => ByteData(0);
-
-  @override
-  Future<String> loadString(String key, {bool cache = true}) async => '';
-}
-
-Future<Directory> _tempDir() async => Directory.systemTemp;
 
 void main() {
   group('GemmaNotifier state transitions', () {

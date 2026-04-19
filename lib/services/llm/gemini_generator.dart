@@ -10,12 +10,11 @@ import 'gemma_generator.dart';
 import 'llm_constants.dart';
 
 /// Production LLM backend that calls Google's Gemini `generateContent` REST
-/// endpoint. Replaces the on-device `FlutterGemmaGenerator` on 4 GB RAM
-/// devices where the 2.58 GB `.litertlm` model OOM-kills the app.
+/// endpoint.
 ///
-/// Implements the same [GemmaGenerator] contract as the on-device and Ollama
-/// paths so callers (`GemmaService`, providers, the UI state machine) do not
-/// change. The `modelPath` argument is ignored; Gemini hosts the model.
+/// Implements the [GemmaGenerator] contract so callers (`GemmaService`,
+/// providers, the UI state machine) are unchanged. The `modelPath` argument
+/// is ignored; Gemini hosts the model.
 class GeminiGenerator implements GemmaGenerator {
   GeminiGenerator({
     required this.apiKey,

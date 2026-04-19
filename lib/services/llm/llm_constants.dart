@@ -1,8 +1,9 @@
 /// Gemma LLM configuration constants for NilamAI.
 ///
-/// Uses Gemma 4 E2B INT4 quantized model (~1.3 GB, `.litertlm` format).
-/// Bundled in the APK via `assets/models/` and copied to app documents on
-/// first launch by [GemmaModelLoader].
+/// Uses Gemma 4 E2B model (~2.6 GB, `.litertlm` format) from
+/// litert-community/gemma-4-E2B-it-litert-lm. Bundled in the APK via
+/// `assets/models/` and copied to app documents on first launch by
+/// [GemmaModelLoader].
 ///
 /// Values follow `docs/srs_1.0.md` §8 (revised 2026-04-16) where they differ
 /// from GitHub issue #6.
@@ -11,8 +12,8 @@ class LlmConstants {
 
   // -- Model --
   static const String modelAssetPath =
-      'assets/models/gemma_4_e2b_int4.litertlm';
-  static const String modelFileName = 'gemma_4_e2b_int4.litertlm';
+      'assets/models/gemma-4-E2B-it.litertlm';
+  static const String modelFileName = 'gemma-4-E2B-it.litertlm';
   static const String modelsSubDir = 'models';
 
   // -- Inference --

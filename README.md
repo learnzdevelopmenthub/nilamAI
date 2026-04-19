@@ -14,7 +14,7 @@ See [docs/srs_1.0.md](docs/srs_1.0.md) for the canonical spec.
 The app ships two on-device models that are **not** committed to git:
 
 - `ggml-base-q8_0.bin` (~75 MB) — Whisper Tamil STT (Phase 4)
-- `gemma_4_e2b_int4.litertlm` (~1.3 GB) — Gemma 4 E2B INT4 LLM (Phase 6)
+- `gemma-4-E2B-it.litertlm` (~2.6 GB) — Gemma 4 E2B LLM (Phase 6)
 
 Fetch both once after cloning, before running `flutter run`:
 

@@ -1,10 +1,14 @@
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../core/exceptions/app_exception.dart';
 import '../core/logging/logger.dart';
+import '../services/llm/gemini_generator.dart';
 import '../services/llm/gemma_generator.dart';
 import '../services/llm/gemma_model_loader.dart';
 import '../services/llm/gemma_service.dart';
+import '../services/llm/llm_constants.dart';
+import '../services/llm/noop_model_loader.dart';
 
 // -----------------------------------------------------------------------------
 // Sealed Gemma state
@@ -43,20 +47,39 @@ class GemmaError extends GemmaState {
 // Providers
 // -----------------------------------------------------------------------------
 
+/// API-mode loader — returns an empty path; the remote [GeminiGenerator]
+/// ignores it. Swap back to [GemmaModelLoader] when reviving on-device mode.
 final gemmaModelLoaderProvider = Provider<GemmaModelLoader>((ref) {
-  return GemmaModelLoader();
+  return NoopModelLoader();
 });
 
-/// Production generator. Override with [OllamaGenerator] for dev, or with a
-/// fake for tests.
+/// Production generator. Currently Gemini REST because the 2.58 GB
+/// `.litertlm` model OOM-kills 4 GB devices (see Phase 6 post-mortem).
+/// Override with [OllamaGenerator] for dev, [FlutterGemmaGenerator] for
+/// on-device hybrid mode, or a fake for tests.
 final gemmaGeneratorProvider = Provider<GemmaGenerator>((ref) {
-  return FlutterGemmaGenerator();
+  if (LlmConstants.geminiApiKey.isEmpty) {
+    throw StateError(
+      'GEMINI_API_KEY is not set. Run: flutter run '
+      '--dart-define=GEMINI_API_KEY=<your-key>. '
+      'Get a key at https://aistudio.google.com/apikey',
+    );
+  }
+  return GeminiGenerator(apiKey: LlmConstants.geminiApiKey);
+});
+
+/// Connectivity probe wired into [GemmaService]. Defaults to the real
+/// `connectivity_plus` plugin; tests override this with `null` to skip the
+/// pre-flight network check (or a fake to exercise the offline path).
+final connectivityCheckProvider = Provider<ConnectivityCheck?>((ref) {
+  return Connectivity().checkConnectivity;
 });
 
 final gemmaServiceProvider = Provider<GemmaService>((ref) {
   return GemmaService(
     loader: ref.watch(gemmaModelLoaderProvider),
     generator: ref.watch(gemmaGeneratorProvider),
+    connectivityCheck: ref.watch(connectivityCheckProvider),
   );
 });
 

@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:connectivity_plus/connectivity_plus.dart';
+
 import '../../core/exceptions/app_exception.dart';
 import '../../core/logging/logger.dart';
 import 'gemma_generator.dart';
@@ -7,6 +9,12 @@ import 'gemma_model_loader.dart';
 import 'llm_constants.dart';
 import 'prompt_builder.dart';
 import 'response_post_processor.dart';
+
+/// Async connectivity probe; returns the current transports (wifi, mobile,
+/// ethernet, vpn, or none). Injected so tests can run without the real
+/// connectivity plugin. Null means "skip the check" — used by existing
+/// tests that predate the remote (API) backend.
+typedef ConnectivityCheck = Future<List<ConnectivityResult>> Function();
 
 /// Outcome of a successful Gemma inference.
 ///
@@ -39,19 +47,23 @@ class GemmaService {
   GemmaService({
     required GemmaModelLoader loader,
     required GemmaGenerator generator,
+    ConnectivityCheck? connectivityCheck,
   })  : _loader = loader,
-        _generator = generator;
+        _generator = generator,
+        _connectivityCheck = connectivityCheck;
 
   static const _tag = 'GemmaService';
 
   final GemmaModelLoader _loader;
   final GemmaGenerator _generator;
+  final ConnectivityCheck? _connectivityCheck;
 
   /// Generates a Tamil response for [query], optionally contextualized with
   /// [cropType] from the user profile.
   ///
   /// Error handling (SRS §10.3):
   /// - [LlmException.invalidQuery] (E012) — empty/whitespace query
+  /// - [LlmException.networkOffline] (E013) — device offline in API mode
   /// - [LlmException.modelNotLoaded] (E009) — model asset missing or I/O error
   /// - [LlmException.inferenceTimeout] (E010) — >30 s without a response
   /// - [LlmException.outOfMemory] (E011) — OOM during inference
@@ -61,6 +73,13 @@ class GemmaService {
   }) async {
     // PromptBuilder throws E012 on empty/whitespace.
     final built = PromptBuilder.build(query: query, cropType: cropType);
+
+    if (_connectivityCheck != null) {
+      final status = await _connectivityCheck();
+      if (status.every((c) => c == ConnectivityResult.none)) {
+        throw LlmException.networkOffline();
+      }
+    }
 
     final String modelPath;
     try {

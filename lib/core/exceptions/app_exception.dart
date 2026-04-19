@@ -13,6 +13,7 @@
 /// - E010: Gemma inference timeout (>30s)
 /// - E011: Gemma out of memory during inference
 /// - E012: Invalid query for Gemma
+/// - E013: LLM network offline (API mode)
 sealed class AppException implements Exception {
   const AppException({
     required this.code,
@@ -95,6 +96,13 @@ class LlmException extends AppException {
       : this(
           code: 'E012',
           message: 'Invalid query for Gemma: $detail',
+        );
+
+  LlmException.networkOffline({Object? originalError})
+      : this(
+          code: 'E013',
+          message: 'No internet connection — try again when online',
+          originalError: originalError,
         );
 }
 

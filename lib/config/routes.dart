@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../core/constants/strings_tamil.dart';
+import '../screens/history/history_screen.dart';
+import '../screens/home/home_screen.dart';
 import '../screens/recording/recording_screen.dart';
+import '../screens/response/response_screen.dart';
+import '../screens/settings/settings_screen.dart';
 import '../screens/transcription/transcribing_screen.dart';
 import '../screens/transcription/transcription_review_screen.dart';
 
@@ -43,52 +46,28 @@ final GoRouter appRouter = GoRouter(
         );
       },
     ),
+    GoRoute(
+      path: '/response/:queryId',
+      name: 'response',
+      builder: (BuildContext context, GoRouterState state) {
+        return ResponseScreen(
+          queryId: state.pathParameters['queryId']!,
+        );
+      },
+    ),
+    GoRoute(
+      path: '/history',
+      name: 'history',
+      builder: (BuildContext context, GoRouterState state) {
+        return const HistoryScreen();
+      },
+    ),
+    GoRoute(
+      path: '/settings',
+      name: 'settings',
+      builder: (BuildContext context, GoRouterState state) {
+        return const SettingsScreen();
+      },
+    ),
   ],
 );
-
-/// Temporary home screen for Phase 1 verification.
-/// Will be replaced by the actual home screen in Phase 5a.
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('NilamAI'),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.agriculture,
-              size: 64,
-              color: theme.colorScheme.primary,
-            ),
-            const SizedBox(height: 16),
-            Text(
-              TamilStrings.appName,
-              style: theme.textTheme.headlineLarge?.copyWith(
-                color: theme.colorScheme.primary,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              '${TamilStrings.greeting} ${TamilStrings.appTagline}',
-              style: theme.textTheme.bodyLarge?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => context.push('/record'),
-        tooltip: TamilStrings.record,
-        child: const Icon(Icons.mic),
-      ),
-    );
-  }
-}

@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'config/routes.dart';
 import 'config/theme.dart';
 import 'core/logging/logger.dart';
 import 'providers/database_providers.dart';
+import 'providers/settings_providers.dart';
 import 'services/database/database_service.dart';
 
 void main() async {
@@ -17,10 +19,13 @@ void main() async {
     AppLogger.error('Database initialization failed', 'main', e);
   }
 
+  final prefs = await SharedPreferences.getInstance();
+
   runApp(
     ProviderScope(
       overrides: [
         databaseServiceProvider.overrideWithValue(dbService),
+        sharedPreferencesProvider.overrideWithValue(prefs),
       ],
       child: const NilamAIApp(),
     ),

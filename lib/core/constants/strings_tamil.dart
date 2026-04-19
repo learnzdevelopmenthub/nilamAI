@@ -95,6 +95,10 @@ class TamilStrings {
   static const String yourQuestion = 'உங்கள் கேள்வி';
   static const String aiResponse = 'AI பதில்';
   static const String responsePlaceholder = '🌾 AI பதில் விரைவில் வரும்...';
+  static const String gemmaLoadingModel = 'AI மாதிரி ஏற்றப்படுகிறது...';
+  static const String gemmaGenerating = 'AI பதிலை உருவாக்குகிறது...';
+  static const String gemmaError = 'AI பதில் கிடைக்கவில்லை';
+  static const String gemmaGenerateAnswer = '✨ AI பதிலைப் பெறு';
   static const String audioComingSoon = '🔊 விரைவில் வரும்';
   static const String helpful = '👍 பயனுள்ளது';
   static const String notHelpful = '👎 பயனில்லை';

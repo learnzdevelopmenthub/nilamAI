@@ -23,6 +23,8 @@ dependencies:
   path_provider: ^2.1.0
   whisper_ggml: ^1.7.0
   package_info_plus: ^8.0.0
+  http: ^1.2.0
+  flutter_gemma: ^0.12.6
 
 dev_dependencies:
   flutter_test:

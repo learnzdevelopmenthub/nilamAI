@@ -33,6 +33,7 @@ class RecordingControls extends ConsumerWidget {
           height: 80,
           child: FloatingActionButton(
             heroTag: 'record_btn',
+            tooltip: TamilStrings.tapToRecord,
             onPressed: notifier.startRecording,
             backgroundColor: NilamTheme.warmAmber,
             child: const Icon(Icons.mic, size: 36, color: NilamTheme.onSurface),
@@ -69,6 +70,7 @@ class RecordingControls extends ConsumerWidget {
           height: 72,
           child: FloatingActionButton(
             heroTag: 'stop_btn',
+            tooltip: TamilStrings.stop,
             onPressed: notifier.stopRecording,
             backgroundColor: NilamTheme.redPrimary,
             child:

@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../core/exceptions/app_exception.dart';
 import '../core/logging/logger.dart';
-import '../services/llm/gemini_generator.dart';
+import '../services/llm/deepinfra_generator.dart';
 import '../services/llm/gemma_generator.dart';
 import '../services/llm/gemma_service.dart';
 import '../services/llm/llm_constants.dart';
@@ -47,22 +47,22 @@ class GemmaError extends GemmaState {
 // Providers
 // -----------------------------------------------------------------------------
 
-/// API-mode loader — returns an empty path; the remote [GeminiGenerator]
+/// API-mode loader — returns an empty path; the remote [DeepInfraGenerator]
 /// ignores it.
 final gemmaModelLoaderProvider = Provider<ModelLoader>((ref) {
   return NoopModelLoader();
 });
 
-/// Production generator: Gemini REST.
+/// Production generator: DeepInfra-hosted Gemma 4.
 final gemmaGeneratorProvider = Provider<GemmaGenerator>((ref) {
-  if (LlmConstants.geminiApiKey.isEmpty) {
+  if (LlmConstants.deepInfraApiKey.isEmpty) {
     throw StateError(
-      'GEMINI_API_KEY is not set. Run: flutter run '
-      '--dart-define=GEMINI_API_KEY=<your-key>. '
-      'Get a key at https://aistudio.google.com/apikey',
+      'DEEPINFRA_API_KEY is not set. Add it to `.env` or pass '
+      '--dart-define=DEEPINFRA_API_KEY=<your-key>. '
+      'Get a key at https://deepinfra.com/dash/api_keys',
     );
   }
-  return GeminiGenerator(apiKey: LlmConstants.geminiApiKey);
+  return DeepInfraGenerator(apiKey: LlmConstants.deepInfraApiKey);
 });
 
 /// Connectivity probe wired into [GemmaService]. Defaults to the real

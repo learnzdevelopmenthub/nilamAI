@@ -179,16 +179,19 @@ class _HistoryTile extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return ListTile(
-      title: Text(
-        query.transcription,
-        maxLines: 2,
-        overflow: TextOverflow.ellipsis,
+    return Semantics(
+      onLongPressHint: TamilStrings.delete,
+      child: ListTile(
+        title: Text(
+          query.transcription,
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+        ),
+        subtitle: Text(formatRelativeTamil(query.timestamp)),
+        trailing: _ratingIcon(query.userRating),
+        onTap: () => context.push('/response/${query.id}'),
+        onLongPress: () => _confirmDelete(context, ref),
       ),
-      subtitle: Text(formatRelativeTamil(query.timestamp)),
-      trailing: _ratingIcon(query.userRating),
-      onTap: () => context.push('/response/${query.id}'),
-      onLongPress: () => _confirmDelete(context, ref),
     );
   }
 

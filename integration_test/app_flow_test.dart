@@ -155,7 +155,7 @@ void main() {
     // queryByIdProvider invalidates, then rebuild with hasStored=true.
     await _drainAsync(tester, 30);
 
-    // Response screen — canned Gemini text rendered once the listener persists
+    // Response screen — canned LLM text rendered once the listener persists
     // the response and invalidates queryByIdProvider.
     expect(find.textContaining('நெல் பயிரில்'), findsOneWidget);
     expect(find.text(TamilStrings.goHome), findsOneWidget);

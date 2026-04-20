@@ -6,7 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 import 'package:nilam_ai/core/exceptions/app_exception.dart';
-import 'package:nilam_ai/services/llm/gemini_generator.dart';
+import 'package:nilam_ai/services/llm/deepinfra_generator.dart';
 
 http.Response _json(Object body, [int status = 200]) => http.Response.bytes(
       utf8.encode(jsonEncode(body)),
@@ -15,27 +15,27 @@ http.Response _json(Object body, [int status = 200]) => http.Response.bytes(
     );
 
 void main() {
-  group('GeminiGenerator.generate', () {
-    test('POSTs prompt to v1beta endpoint and returns Tamil text', () async {
+  group('DeepInfraGenerator.generate', () {
+    test('POSTs OpenAI-shaped body to DeepInfra and returns Tamil text',
+        () async {
       http.Request? captured;
       final client = MockClient((request) async {
         captured = request;
         return _json({
-          'candidates': [
+          'choices': [
             {
-              'content': {
-                'parts': [
-                  {'text': 'தக்காளிச் செடிக்கு நீம் எண்ணெய் பயன்படுத்துங்கள்.'},
-                ],
+              'message': {
+                'role': 'assistant',
+                'content': 'தக்காளிச் செடிக்கு நீம் எண்ணெய் பயன்படுத்துங்கள்.',
               },
             },
           ],
         });
       });
 
-      final gen = GeminiGenerator(
+      final gen = DeepInfraGenerator(
         apiKey: 'test-key',
-        model: 'gemini-1.5-flash-latest',
+        model: 'google/gemma-4-26B-A4B-it',
         client: client,
       );
 
@@ -52,27 +52,30 @@ void main() {
       );
       expect(captured, isNotNull);
       expect(captured!.method, equals('POST'));
-      expect(captured!.url.host, equals('generativelanguage.googleapis.com'));
+      expect(captured!.url.host, equals('api.deepinfra.com'));
       expect(
         captured!.url.path,
-        equals('/v1beta/models/gemini-1.5-flash-latest:generateContent'),
+        equals('/v1/openai/chat/completions'),
       );
-      expect(captured!.url.queryParameters['key'], equals('test-key'));
+      expect(
+        captured!.headers['authorization'],
+        equals('Bearer test-key'),
+      );
 
       final decoded = jsonDecode(captured!.body) as Map<String, dynamic>;
-      final parts =
-          ((decoded['contents'] as List).first as Map)['parts'] as List;
-      expect((parts.first as Map)['text'], equals('test prompt'));
-      final cfg = decoded['generationConfig'] as Map;
-      expect(cfg['maxOutputTokens'], equals(300));
-      expect(cfg['temperature'], equals(0.3));
+      expect(decoded['model'], equals('google/gemma-4-26B-A4B-it'));
+      final messages = decoded['messages'] as List;
+      expect((messages.first as Map)['role'], equals('user'));
+      expect((messages.first as Map)['content'], equals('test prompt'));
+      expect(decoded['max_tokens'], equals(300));
+      expect(decoded['temperature'], equals(0.3));
     });
 
-    test('throws LlmException on non-200 status (e.g. 400 auth)', () async {
+    test('throws LlmException on non-200 status (e.g. 401 auth)', () async {
       final client = MockClient((request) async {
-        return http.Response('bad api key', 400);
+        return http.Response('bad api key', 401);
       });
-      final gen = GeminiGenerator(apiKey: 'bad-key', client: client);
+      final gen = DeepInfraGenerator(apiKey: 'bad-key', client: client);
 
       await expectLater(
         gen.generate(
@@ -89,7 +92,7 @@ void main() {
       final client = MockClient((request) async {
         throw const SocketException('no route to host');
       });
-      final gen = GeminiGenerator(apiKey: 'k', client: client);
+      final gen = DeepInfraGenerator(apiKey: 'k', client: client);
 
       try {
         await gen.generate(
@@ -108,7 +111,7 @@ void main() {
       final client = MockClient((request) async {
         throw TimeoutException('slow');
       });
-      final gen = GeminiGenerator(apiKey: 'k', client: client);
+      final gen = DeepInfraGenerator(apiKey: 'k', client: client);
 
       try {
         await gen.generate(
@@ -123,11 +126,11 @@ void main() {
       }
     });
 
-    test('throws when candidates array is empty', () async {
+    test('throws when choices array is empty', () async {
       final client = MockClient((request) async {
-        return _json({'candidates': <Object>[]});
+        return _json({'choices': <Object>[]});
       });
-      final gen = GeminiGenerator(apiKey: 'k', client: client);
+      final gen = DeepInfraGenerator(apiKey: 'k', client: client);
 
       await expectLater(
         gen.generate(
@@ -144,7 +147,7 @@ void main() {
       final client = MockClient((request) async {
         return http.Response('<html>oops</html>', 200);
       });
-      final gen = GeminiGenerator(apiKey: 'k', client: client);
+      final gen = DeepInfraGenerator(apiKey: 'k', client: client);
 
       await expectLater(
         gen.generate(
@@ -157,19 +160,17 @@ void main() {
       );
     });
 
-    test('throws when text field is missing from parts', () async {
+    test('throws when message.content is missing', () async {
       final client = MockClient((request) async {
         return _json({
-          'candidates': [
+          'choices': [
             {
-              'content': {
-                'parts': [<String, Object>{}],
-              },
+              'message': <String, Object>{'role': 'assistant'},
             },
           ],
         });
       });
-      final gen = GeminiGenerator(apiKey: 'k', client: client);
+      final gen = DeepInfraGenerator(apiKey: 'k', client: client);
 
       await expectLater(
         gen.generate(

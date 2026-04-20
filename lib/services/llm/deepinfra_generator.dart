@@ -9,23 +9,23 @@ import '../../core/logging/logger.dart';
 import 'gemma_generator.dart';
 import 'llm_constants.dart';
 
-/// Production LLM backend that calls Google's Gemini `generateContent` REST
-/// endpoint.
+/// Production LLM backend that calls DeepInfra's OpenAI-compatible
+/// chat-completions endpoint to run Gemma 4.
 ///
 /// Implements the [GemmaGenerator] contract so callers (`GemmaService`,
 /// providers, the UI state machine) are unchanged. The `modelPath` argument
-/// is ignored; Gemini hosts the model.
-class GeminiGenerator implements GemmaGenerator {
-  GeminiGenerator({
+/// is ignored; DeepInfra hosts the model.
+class DeepInfraGenerator implements GemmaGenerator {
+  DeepInfraGenerator({
     required this.apiKey,
     String? baseUrl,
     String? model,
     http.Client? client,
-  })  : baseUrl = baseUrl ?? LlmConstants.geminiBaseUrl,
-        model = model ?? LlmConstants.geminiModel,
+  })  : baseUrl = baseUrl ?? LlmConstants.deepInfraBaseUrl,
+        model = model ?? LlmConstants.deepInfraModel,
         _client = client ?? http.Client();
 
-  static const _tag = 'GeminiGenerator';
+  static const _tag = 'DeepInfraGenerator';
 
   final String apiKey;
   final String baseUrl;
@@ -39,19 +39,14 @@ class GeminiGenerator implements GemmaGenerator {
     required int maxTokens,
     required double temperature,
   }) async {
-    final uri = Uri.parse('$baseUrl/$model:generateContent?key=$apiKey');
+    final uri = Uri.parse(baseUrl);
     final body = jsonEncode({
-      'contents': [
-        {
-          'parts': [
-            {'text': prompt},
-          ],
-        },
+      'model': model,
+      'messages': [
+        {'role': 'user', 'content': prompt},
       ],
-      'generationConfig': {
-        'maxOutputTokens': maxTokens,
-        'temperature': temperature,
-      },
+      'max_tokens': maxTokens,
+      'temperature': temperature,
     });
 
     final http.Response response;
@@ -59,7 +54,10 @@ class GeminiGenerator implements GemmaGenerator {
       response = await _client
           .post(
             uri,
-            headers: const {'Content-Type': 'application/json'},
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer $apiKey',
+            },
             body: body,
           )
           .timeout(
@@ -76,15 +74,16 @@ class GeminiGenerator implements GemmaGenerator {
     if (response.statusCode != 200) {
       final bodyText = utf8.decode(response.bodyBytes, allowMalformed: true);
       AppLogger.error(
-        'Gemini HTTP ${response.statusCode}: $bodyText',
+        'DeepInfra HTTP ${response.statusCode}: $bodyText',
         _tag,
       );
       throw LlmException(
-        message: 'Gemini returned HTTP ${response.statusCode}: $bodyText',
+        message:
+            'DeepInfra returned HTTP ${response.statusCode}: $bodyText',
       );
     }
 
-    // Decode as UTF-8 directly — matches OllamaGenerator for correct Tamil.
+    // Decode as UTF-8 directly so Tamil round-trips correctly.
     final Map<String, dynamic> decoded;
     try {
       decoded = jsonDecode(utf8.decode(response.bodyBytes))
@@ -93,31 +92,24 @@ class GeminiGenerator implements GemmaGenerator {
       throw LlmException.modelNotLoaded(originalError: e);
     }
 
-    final candidates = decoded['candidates'];
-    if (candidates is! List || candidates.isEmpty) {
+    final choices = decoded['choices'];
+    if (choices is! List || choices.isEmpty) {
       throw const LlmException(
-        message: 'Gemini response missing "candidates"',
+        message: 'DeepInfra response missing "choices"',
         code: 'E009',
       );
     }
 
-    final content = (candidates.first as Map<String, dynamic>)['content'];
-    final parts = (content is Map<String, dynamic>) ? content['parts'] : null;
-    if (parts is! List || parts.isEmpty) {
+    final message = (choices.first as Map<String, dynamic>)['message'];
+    final content =
+        (message is Map<String, dynamic>) ? message['content'] : null;
+    if (content is! String || content.isEmpty) {
       throw const LlmException(
-        message: 'Gemini response missing "content.parts"',
+        message: 'DeepInfra response missing "message.content"',
         code: 'E009',
       );
     }
-
-    final text = (parts.first as Map<String, dynamic>)['text'];
-    if (text is! String || text.isEmpty) {
-      throw const LlmException(
-        message: 'Gemini response missing text',
-        code: 'E009',
-      );
-    }
-    return text;
+    return content;
   }
 
   /// Test-only — closes the underlying HTTP client.

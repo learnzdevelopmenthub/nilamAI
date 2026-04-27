@@ -1,4 +1,5 @@
 import '../../core/exceptions/app_exception.dart';
+import '../retrieval/knowledge_chunk.dart';
 
 /// Result of building a Gemma prompt: the final prompt string ready for
 /// inference, plus the raw query for later persistence in `QueryHistory`.
@@ -10,6 +11,32 @@ class BuiltPrompt {
 
   /// The raw user query (unmodified), retained for DB persistence.
   final String query;
+}
+
+/// Top-K chunks pulled from the knowledge base by [KnowledgeRetriever] for
+/// the current query. Rendered as a "Reference notes:" block before the
+/// farmer's question.
+class RetrievedContext {
+  const RetrievedContext({required this.chunks});
+
+  final List<KnowledgeChunk> chunks;
+
+  bool get isEmpty => chunks.isEmpty;
+
+  String render() {
+    if (chunks.isEmpty) return '';
+    final buf = StringBuffer('Reference notes:\n');
+    for (final c in chunks) {
+      buf.writeln('- [${_tagFor(c)}] ${c.text}');
+    }
+    return buf.toString().trimRight();
+  }
+
+  static String _tagFor(KnowledgeChunk c) {
+    final crop = c.cropIds.isEmpty ? 'general' : c.cropIds.first;
+    final stage = c.stageIds.isEmpty ? null : c.stageIds.first;
+    return stage == null ? crop : '$crop/$stage';
+  }
 }
 
 /// Optional grounding context drawn from a tracked crop profile + the
@@ -77,6 +104,7 @@ class PromptBuilder {
     required String query,
     String? cropType,
     CropContext? cropContext,
+    RetrievedContext? retrieved,
   }) {
     final trimmedQuery = query.trim();
     if (trimmedQuery.isEmpty) {
@@ -99,6 +127,12 @@ class PromptBuilder {
           ..writeln('Context: Crop is $trimmedCrop.')
           ..writeln();
       }
+    }
+
+    if (retrieved != null && !retrieved.isEmpty) {
+      buf
+        ..writeln(retrieved.render())
+        ..writeln();
     }
 
     buf

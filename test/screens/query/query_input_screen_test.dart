@@ -5,11 +5,24 @@ import 'package:go_router/go_router.dart';
 import 'package:nilam_ai/config/theme.dart';
 import 'package:nilam_ai/core/constants/strings_tamil.dart';
 import 'package:nilam_ai/providers/database_providers.dart';
+import 'package:nilam_ai/providers/feature_providers.dart';
 import 'package:nilam_ai/providers/llm_providers.dart';
 import 'package:nilam_ai/services/llm/prompt_builder.dart';
 import 'package:nilam_ai/screens/query/query_input_screen.dart';
 import 'package:nilam_ai/services/database/database_service.dart';
+import 'package:nilam_ai/services/retrieval/knowledge_chunk.dart';
+import 'package:nilam_ai/services/retrieval/knowledge_retriever.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+
+class _NoopRetriever implements KnowledgeRetriever {
+  @override
+  Future<List<RankedChunk>> retrieve({
+    required String query,
+    String? cropId,
+    String? stageId,
+    int topK = 5,
+  }) async => const [];
+}
 
 GoRouter _router({required List<String> visited}) {
   return GoRouter(
@@ -39,6 +52,7 @@ Widget _app({
     overrides: [
       databaseServiceProvider.overrideWithValue(db),
       gemmaNotifierProvider.overrideWith(() => gemma ?? _FakeGemmaNotifier()),
+      knowledgeRetrieverProvider.overrideWithValue(_NoopRetriever()),
     ],
     child: MaterialApp.router(
       theme: NilamTheme.lightTheme,
@@ -60,6 +74,7 @@ class _FakeGemmaNotifier extends GemmaNotifier {
     required String query,
     String? cropType,
     CropContext? cropContext,
+    RetrievedContext? retrieved,
   }) async {
     generateCalls += 1;
     lastQuery = query;

@@ -4,9 +4,15 @@ import '../services/diagnosis/diagnosis_service.dart';
 import '../services/knowledge/crop_knowledge.dart';
 import '../services/knowledge/crop_knowledge_service.dart';
 import '../services/market/market_service.dart';
+import '../services/notifications/crop_reminder_scheduler.dart';
+import '../services/notifications/notification_service.dart';
+import '../services/retrieval/bm25_retriever.dart';
+import '../services/retrieval/disease_chunk_loader.dart';
+import '../services/retrieval/knowledge_retriever.dart';
 import '../services/schemes/scheme.dart';
 import '../services/schemes/scheme_service.dart';
 import '../services/tts/tts_service.dart';
+import 'database_providers.dart';
 import 'llm_providers.dart';
 import 'settings_providers.dart';
 
@@ -64,4 +70,41 @@ final marketServiceProvider = Provider<MarketService>((ref) {
 
 final ttsServiceProvider = Provider<TtsService>((ref) {
   return TtsService();
+});
+
+// -----------------------------------------------------------------------------
+// Knowledge retrieval (BM25 today; vector retriever drops in via override).
+// -----------------------------------------------------------------------------
+
+final diseaseChunkLoaderProvider = Provider<DiseaseChunkLoader>((ref) {
+  return DiseaseChunkLoader();
+});
+
+final knowledgeRetrieverProvider = Provider<KnowledgeRetriever>((ref) {
+  return BM25Retriever(
+    cropKnowledge: ref.watch(cropKnowledgeServiceProvider),
+    diseaseLoader: ref.watch(diseaseChunkLoaderProvider),
+  );
+});
+
+// -----------------------------------------------------------------------------
+// Local notifications (overridden in main.dart after initialize()).
+// -----------------------------------------------------------------------------
+
+final notificationServiceProvider = Provider<NotificationService>((ref) {
+  throw UnimplementedError(
+    'notificationServiceProvider must be overridden in main() with an '
+    'initialized NotificationService',
+  );
+});
+
+final cropReminderSchedulerProvider =
+    Provider<CropReminderScheduler>((ref) {
+  return CropReminderScheduler(
+    notifications: ref.watch(notificationServiceProvider),
+    knowledgeService: ref.watch(cropKnowledgeServiceProvider),
+    cropDao: ref.watch(cropProfileDaoProvider),
+    notificationsEnabled: () =>
+        ref.read(settingsProvider).notificationsEnabled,
+  );
 });

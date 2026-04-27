@@ -26,6 +26,8 @@ dependencies:
   flutter_dotenv: ^5.1.0
   image_picker: ^1.2.1
   url_launcher: ^6.3.0
+  flutter_local_notifications: ^17.2.3
+  timezone: ^0.9.4
 
 dev_dependencies:
   flutter_test:
@@ -42,3 +44,4 @@ flutter:
     - .env
     - assets/knowledge/crops.json
     - assets/knowledge/schemes.json
+    - assets/knowledge/diseases.json

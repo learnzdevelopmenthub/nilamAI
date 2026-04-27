@@ -64,8 +64,10 @@ class _AddCropScreenState extends ConsumerState<AddCropScreen> {
 
   Future<void> _save() async {
     if (_saving) return;
-    if (_selectedCrop == null) return;
+    // Run the form validator first so the dropdown's "Pick a crop" error
+    // becomes visible inline; only bail to a no-op once that surfaces.
     if (!(_formKey.currentState?.validate() ?? false)) return;
+    if (_selectedCrop == null) return;
     setState(() => _saving = true);
     try {
       final dao = ref.read(cropProfileDaoProvider);
@@ -85,6 +87,13 @@ class _AddCropScreenState extends ConsumerState<AddCropScreen> {
         updatedAt: now,
       );
       await dao.insert(crop);
+      // Schedule stage-transition reminders (FR-3.1.4) for the new crop.
+      // Best-effort — failures shouldn't block the save.
+      try {
+        await ref.read(cropReminderSchedulerProvider).scheduleFor(crop);
+      } catch (e, st) {
+        AppLogger.warning('Reminder scheduling failed: $e\n$st', _tag);
+      }
       ref.invalidate(userCropProfilesProvider(userId));
       if (!mounted) return;
       context.pop();

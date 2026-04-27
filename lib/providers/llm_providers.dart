@@ -101,6 +101,7 @@ class GemmaNotifier extends Notifier<GemmaState> {
     required String query,
     String? cropType,
     CropContext? cropContext,
+    RetrievedContext? retrieved,
   }) async {
     state = const GemmaLoadingModel();
     AppLogger.info('Gemma generation started', _tag);
@@ -114,6 +115,7 @@ class GemmaNotifier extends Notifier<GemmaState> {
         query: query,
         cropType: cropType,
         cropContext: cropContext,
+        retrieved: retrieved,
       );
       state = GemmaComplete(response: response);
       AppLogger.info(

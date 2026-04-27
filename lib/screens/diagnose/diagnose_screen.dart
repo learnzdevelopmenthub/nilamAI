@@ -13,6 +13,7 @@ import '../../providers/user_providers.dart';
 import '../../services/database/models/crop_profile.dart';
 import '../../services/diagnosis/diagnosis_models.dart';
 import '../../services/knowledge/crop_knowledge.dart';
+import '../../services/retrieval/knowledge_chunk.dart';
 
 class DiagnoseScreen extends ConsumerStatefulWidget {
   const DiagnoseScreen({this.preselectedCropProfileId, super.key});
@@ -103,7 +104,24 @@ class _DiagnoseScreenState extends ConsumerState<DiagnoseScreen> {
         imageBytes: bytes,
         symptomsText: hasSymptoms ? _symptomsController.text.trim() : null,
       );
-      final res = await ref.read(diagnosisServiceProvider).diagnose(req);
+
+      // Pull top-K disease + stage chunks to ground the diagnosis prompt.
+      final retrievalQuery = hasSymptoms
+          ? _symptomsController.text.trim()
+          : '${tpl?.name ?? ''} ${stage?.name ?? ''} disease symptoms'.trim();
+      final ranked = retrievalQuery.isEmpty
+          ? const <RankedChunk>[]
+          : await ref.read(knowledgeRetrieverProvider).retrieve(
+                query: retrievalQuery,
+                cropId: _selectedCrop?.cropId,
+                stageId: stage?.id,
+                topK: 5,
+              );
+      final res = await ref.read(diagnosisServiceProvider).diagnose(
+            req,
+            retrievedChunks:
+                ranked.map((r) => r.chunk).toList(growable: false),
+          );
       if (!mounted) return;
       setState(() => _result = res);
     } on LlmException catch (e) {

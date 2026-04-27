@@ -80,13 +80,24 @@ class CropDetailScreen extends ConsumerWidget {
     if (ok != true) return;
     try {
       await ref.read(cropProfileDaoProvider).delete(cropProfileId);
+      // Cancel any scheduled reminders for this crop. Best-effort.
+      try {
+        await ref
+            .read(notificationServiceProvider)
+            .cancelForCrop(cropProfileId);
+      } catch (e, st) {
+        AppLogger.warning(
+            'Failed to cancel reminders on delete: $e\n$st', 'CropDetailScreen');
+      }
       final userId = await ref.read(currentUserIdProvider.future);
       ref.invalidate(userCropProfilesProvider(userId));
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text(TamilStrings.deleted)),
       );
-      context.pop();
+      // Use go() rather than pop() so the user lands back on the list even
+      // when this screen was opened from a deep link with no prior history.
+      context.go('/');
     } catch (e, st) {
       AppLogger.error('Failed to delete crop', 'CropDetailScreen', e, st);
       if (!context.mounted) return;

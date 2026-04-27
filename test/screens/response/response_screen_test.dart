@@ -5,11 +5,14 @@ import 'package:go_router/go_router.dart';
 import 'package:nilam_ai/core/constants/strings_tamil.dart';
 import 'package:nilam_ai/providers/database_providers.dart';
 import 'package:nilam_ai/providers/llm_providers.dart';
+import 'package:nilam_ai/providers/settings_providers.dart';
 import 'package:nilam_ai/screens/response/response_screen.dart';
 import 'package:nilam_ai/services/database/database_service.dart';
 import 'package:nilam_ai/services/database/models/query_history.dart';
 import 'package:nilam_ai/services/database/models/user_profile.dart';
 import 'package:nilam_ai/services/llm/gemma_service.dart';
+import 'package:nilam_ai/services/llm/prompt_builder.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:uuid/uuid.dart';
 
@@ -33,12 +36,14 @@ GoRouter _router(String queryId, List<String> visited) => GoRouter(
 
 Widget _app({
   required DatabaseService db,
+  required SharedPreferences prefs,
   required GoRouter router,
   _FakeGemmaNotifier? gemma,
 }) {
   return ProviderScope(
     overrides: [
       databaseServiceProvider.overrideWithValue(db),
+      sharedPreferencesProvider.overrideWithValue(prefs),
       if (gemma != null) gemmaNotifierProvider.overrideWith(() => gemma),
     ],
     child: MaterialApp.router(routerConfig: router),
@@ -96,7 +101,11 @@ class _FakeGemmaNotifier extends GemmaNotifier {
   GemmaState build() => initialState;
 
   @override
-  Future<void> generate({required String query, String? cropType}) async {
+  Future<void> generate({
+    required String query,
+    String? cropType,
+    CropContext? cropContext,
+  }) async {
     generateCalls += 1;
     lastQuery = query;
     lastCropType = cropType;
@@ -112,10 +121,13 @@ void main() {
   });
 
   late DatabaseService db;
+  late SharedPreferences prefs;
 
   setUp(() async {
     db = DatabaseService.create();
     await db.initialize(path: inMemoryDatabasePath);
+    SharedPreferences.setMockInitialValues({});
+    prefs = await SharedPreferences.getInstance();
   });
 
   tearDown(() async {
@@ -126,13 +138,14 @@ void main() {
     testWidgets('renders transcription and placeholder when response is null',
         (tester) async {
       final id = await tester.runAsync(() => _seedQuery(db));
-      await tester.pumpWidget(_app(db: db, router: _router(id!, [])));
+      await tester.pumpWidget(_app(db: db, prefs: prefs, router: _router(id!, [])));
       await _settle(tester);
 
       expect(find.text('நெல் நோய் என்ன?'), findsOneWidget);
       expect(find.text(TamilStrings.responsePlaceholder), findsOneWidget);
       expect(find.text(TamilStrings.gemmaGenerateAnswer), findsOneWidget);
-      expect(find.text(TamilStrings.audioComingSoon), findsOneWidget);
+      // Audio play button is rendered but disabled until a stored response.
+      expect(find.byIcon(Icons.play_arrow), findsOneWidget);
     });
 
     testWidgets(
@@ -141,7 +154,7 @@ void main() {
       final id = await tester.runAsync(() => _seedQuery(db));
       final fake = _FakeGemmaNotifier();
       await tester.pumpWidget(
-        _app(db: db, router: _router(id!, []), gemma: fake),
+        _app(db: db, prefs: prefs, router: _router(id!, []), gemma: fake),
       );
       await _settle(tester);
 
@@ -156,7 +169,7 @@ void main() {
       final id = await tester.runAsync(
         () => _seedQuery(db, gemmaResponse: 'செப்பு சல்பேட் தெளிக்கவும்'),
       );
-      await tester.pumpWidget(_app(db: db, router: _router(id!, [])));
+      await tester.pumpWidget(_app(db: db, prefs: prefs, router: _router(id!, [])));
       await _settle(tester);
 
       expect(find.text('செப்பு சல்பேட் தெளிக்கவும்'), findsOneWidget);
@@ -165,7 +178,7 @@ void main() {
 
     testWidgets('audio play/pause icons are disabled', (tester) async {
       final id = await tester.runAsync(() => _seedQuery(db));
-      await tester.pumpWidget(_app(db: db, router: _router(id!, [])));
+      await tester.pumpWidget(_app(db: db, prefs: prefs, router: _router(id!, [])));
       await _settle(tester);
 
       final playButton = tester.widget<IconButton>(
@@ -180,7 +193,7 @@ void main() {
     testWidgets('tapping helpful sets userRating to thumbs_up',
         (tester) async {
       final id = await tester.runAsync(() => _seedQuery(db));
-      await tester.pumpWidget(_app(db: db, router: _router(id!, [])));
+      await tester.pumpWidget(_app(db: db, prefs: prefs, router: _router(id!, [])));
       await _settle(tester);
 
       await tester.tap(find.text(TamilStrings.helpful));
@@ -195,7 +208,7 @@ void main() {
       final id = await tester.runAsync(
         () => _seedQuery(db, userRating: 'thumbs_up'),
       );
-      await tester.pumpWidget(_app(db: db, router: _router(id!, [])));
+      await tester.pumpWidget(_app(db: db, prefs: prefs, router: _router(id!, [])));
       await _settle(tester);
 
       await tester.tap(find.text(TamilStrings.helpful));
@@ -208,7 +221,7 @@ void main() {
     testWidgets('home button navigates to /', (tester) async {
       final visited = <String>[];
       final id = await tester.runAsync(() => _seedQuery(db));
-      await tester.pumpWidget(_app(db: db, router: _router(id!, visited)));
+      await tester.pumpWidget(_app(db: db, prefs: prefs, router: _router(id!, visited)));
       await _settle(tester);
 
       await tester.tap(find.text(TamilStrings.goHome));
@@ -218,7 +231,7 @@ void main() {
     });
 
     testWidgets('shows not-found message for unknown query id', (tester) async {
-      await tester.pumpWidget(_app(db: db, router: _router('does-not-exist', [])));
+      await tester.pumpWidget(_app(db: db, prefs: prefs, router: _router('does-not-exist', [])));
       await _settle(tester);
 
       expect(find.text(TamilStrings.queryNotFound), findsOneWidget);
@@ -228,7 +241,7 @@ void main() {
       final id = await tester.runAsync(() => _seedQuery(db));
       final fake = _FakeGemmaNotifier(initialState: const GemmaLoadingModel());
       await tester.pumpWidget(
-        _app(db: db, router: _router(id!, []), gemma: fake),
+        _app(db: db, prefs: prefs, router: _router(id!, []), gemma: fake),
       );
       await _settle(tester);
 
@@ -241,7 +254,7 @@ void main() {
       final id = await tester.runAsync(() => _seedQuery(db));
       final fake = _FakeGemmaNotifier(initialState: const GemmaGenerating());
       await tester.pumpWidget(
-        _app(db: db, router: _router(id!, []), gemma: fake),
+        _app(db: db, prefs: prefs, router: _router(id!, []), gemma: fake),
       );
       await _settle(tester);
 
@@ -255,7 +268,7 @@ void main() {
       final id = await tester.runAsync(() => _seedQuery(db));
       final fake = _FakeGemmaNotifier(initialState: const GemmaGenerating());
       await tester.pumpWidget(
-        _app(db: db, router: _router(id!, []), gemma: fake),
+        _app(db: db, prefs: prefs, router: _router(id!, []), gemma: fake),
       );
       await _settle(tester);
 
@@ -287,7 +300,7 @@ void main() {
       // live failure arriving while the screen is mounted.
       final fake = _FakeGemmaNotifier(initialState: const GemmaGenerating());
       await tester.pumpWidget(
-        _app(db: db, router: _router(id!, []), gemma: fake),
+        _app(db: db, prefs: prefs, router: _router(id!, []), gemma: fake),
       );
       await _settle(tester);
 
@@ -320,7 +333,7 @@ void main() {
         ),
       );
       await tester.pumpWidget(
-        _app(db: db, router: _router(id!, []), gemma: fake),
+        _app(db: db, prefs: prefs, router: _router(id!, []), gemma: fake),
       );
       await _settle(tester);
 
@@ -336,7 +349,7 @@ void main() {
         initialState: const GemmaError(code: 'E010', message: 'prior failure'),
       );
       await tester.pumpWidget(
-        _app(db: db, router: _router(id!, []), gemma: fake),
+        _app(db: db, prefs: prefs, router: _router(id!, []), gemma: fake),
       );
       // Error state renders first; post-frame reset then swaps to Idle.
       await _settle(tester);

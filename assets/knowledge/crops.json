@@ -1,0 +1,513 @@
+{
+  "version": 1,
+  "language": "en",
+  "generated_at": "2026-04-27",
+  "crops": [
+    {
+      "id": "rice",
+      "name": "Rice",
+      "varieties": ["Ponni (ADT 45 / CR 1009)", "Samba (BPT 5204 / CO 51)", "ADT 43"],
+      "total_duration_days": 135,
+      "stages": [
+        {
+          "id": "nursery",
+          "name": "Nursery and Seedling",
+          "start_day": 0,
+          "end_day": 21,
+          "key_activities": [
+            "Soak and pre-germinate seeds for 24 hours before sowing.",
+            "Sow on a raised wet nursery bed; keep a thin film of water.",
+            "Apply a light dose of DAP at 7-10 days after sowing."
+          ],
+          "common_diseases": ["Damping-off", "Seedling blast"],
+          "recommended_fertilizer": "DAP 100 g per 10 sq m of nursery bed."
+        },
+        {
+          "id": "transplanting",
+          "name": "Transplanting and Establishment",
+          "start_day": 22,
+          "end_day": 35,
+          "key_activities": [
+            "Transplant 20-25 day-old seedlings, 2-3 per hill.",
+            "Maintain 2-3 cm standing water for the first week.",
+            "Gap-fill any missing hills within 7 days."
+          ],
+          "common_diseases": ["Root rot", "Bacterial leaf blight"],
+          "recommended_fertilizer": "Basal: 60 kg Urea + 75 kg DAP + 25 kg MOP per hectare."
+        },
+        {
+          "id": "tillering",
+          "name": "Active Tillering",
+          "start_day": 36,
+          "end_day": 65,
+          "key_activities": [
+            "Apply first top-dress of urea at 25-30 days after transplanting.",
+            "Hand-weed or use a cono-weeder twice during this stage.",
+            "Keep water level at 3-5 cm; do not let the field dry."
+          ],
+          "common_diseases": ["Leaf blast", "Sheath blight", "Stem borer"],
+          "recommended_fertilizer": "Top-dress 65 kg Urea per hectare."
+        },
+        {
+          "id": "panicle_initiation",
+          "name": "Panicle Initiation and Booting",
+          "start_day": 66,
+          "end_day": 90,
+          "key_activities": [
+            "Apply second urea top-dress at panicle initiation.",
+            "Scout fields twice a week for blast and brown plant hopper.",
+            "Maintain 5 cm water; do not drain at booting."
+          ],
+          "common_diseases": ["Neck blast", "Sheath blight", "Brown plant hopper"],
+          "recommended_fertilizer": "Top-dress 65 kg Urea + 25 kg MOP per hectare."
+        },
+        {
+          "id": "flowering_grain_fill",
+          "name": "Flowering and Grain Filling",
+          "start_day": 91,
+          "end_day": 120,
+          "key_activities": [
+            "Keep a thin layer of water; avoid water stress at flowering.",
+            "Inspect for false smut and neck blast after light rain.",
+            "Stop nitrogen fertilizer; do not spray during peak flowering hours."
+          ],
+          "common_diseases": ["Neck blast", "False smut", "Bacterial leaf blight"],
+          "recommended_fertilizer": "No nitrogen. Foliar 1% KCl spray if leaves yellow."
+        },
+        {
+          "id": "maturity_harvest",
+          "name": "Maturity and Harvest",
+          "start_day": 121,
+          "end_day": 135,
+          "key_activities": [
+            "Drain the field 7-10 days before expected harvest.",
+            "Harvest when 80% of grains in the panicle turn straw-yellow.",
+            "Thresh and sun-dry grain to about 14% moisture."
+          ],
+          "common_diseases": ["Grain discoloration", "Storage pests"],
+          "recommended_fertilizer": "None at this stage."
+        }
+      ],
+      "top_diseases": [
+        {"name": "Blast (leaf and neck)", "symptoms": "Diamond-shaped grey lesions on leaves; black rotted neck below panicle."},
+        {"name": "Sheath blight", "symptoms": "Greenish-grey oval lesions on leaf sheath near water line, spreading upward."},
+        {"name": "Bacterial leaf blight", "symptoms": "Yellow water-soaked streaks from leaf tip turning straw-coloured."}
+      ],
+      "harvest_window_indicators": "Harvest when 80% of grains are firm and straw-yellow and lower leaves dry; grain moisture near 20-22%.",
+      "storage_tip": "Dry grain to 14% moisture and store in clean, sealed jute or PP bags on a wooden pallet away from walls."
+    },
+    {
+      "id": "tomato",
+      "name": "Tomato",
+      "varieties": ["PKM 1", "CO 3", "Arka Rakshak (hybrid)"],
+      "total_duration_days": 120,
+      "stages": [
+        {
+          "id": "nursery",
+          "name": "Nursery",
+          "start_day": 0,
+          "end_day": 25,
+          "key_activities": [
+            "Sow treated seeds in raised beds or pro-trays under shade net.",
+            "Water lightly twice a day; avoid water-logging.",
+            "Harden seedlings by reducing water 3 days before transplanting."
+          ],
+          "common_diseases": ["Damping-off", "Early blight"],
+          "recommended_fertilizer": "Well-rotted FYM 2 kg per sq m of nursery bed."
+        },
+        {
+          "id": "transplant_establishment",
+          "name": "Transplanting and Establishment",
+          "start_day": 26,
+          "end_day": 45,
+          "key_activities": [
+            "Transplant 25-30 day-old seedlings at 60 x 45 cm spacing.",
+            "Irrigate immediately after transplanting and again on day 3.",
+            "Apply basal dose at planting and stake or mulch the rows."
+          ],
+          "common_diseases": ["Bacterial wilt", "Damping-off"],
+          "recommended_fertilizer": "Basal: 50 kg Urea + 200 kg SSP + 40 kg MOP per hectare."
+        },
+        {
+          "id": "vegetative",
+          "name": "Vegetative Growth",
+          "start_day": 46,
+          "end_day": 65,
+          "key_activities": [
+            "Stake plants and remove side shoots below the first flower cluster.",
+            "Irrigate every 4-5 days; keep soil evenly moist.",
+            "Scout twice weekly for leaf miner and whitefly."
+          ],
+          "common_diseases": ["Early blight", "Leaf curl virus", "Whitefly"],
+          "recommended_fertilizer": "Top-dress 50 kg Urea per hectare 30 days after transplant."
+        },
+        {
+          "id": "flowering_fruit_set",
+          "name": "Flowering and Fruit Set",
+          "start_day": 66,
+          "end_day": 85,
+          "key_activities": [
+            "Maintain steady irrigation; uneven moisture causes flower drop and cracking.",
+            "Spray 0.5% calcium nitrate if blossom-end rot symptoms appear.",
+            "Avoid heavy nitrogen; it delays flowering."
+          ],
+          "common_diseases": ["Blossom-end rot", "Fruit borer", "Late blight"],
+          "recommended_fertilizer": "Top-dress 50 kg Urea + 30 kg MOP per hectare."
+        },
+        {
+          "id": "fruit_development",
+          "name": "Fruit Development",
+          "start_day": 86,
+          "end_day": 105,
+          "key_activities": [
+            "Pick ripe fruits every 3-4 days to keep the plant productive.",
+            "Continue scouting for fruit borer; collect and destroy bored fruits.",
+            "Reduce irrigation slightly as fruits ripen to improve flavour."
+          ],
+          "common_diseases": ["Fruit borer", "Late blight", "Fusarium wilt"],
+          "recommended_fertilizer": "Foliar 19:19:19 NPK at 5 g per litre once a week."
+        },
+        {
+          "id": "harvest",
+          "name": "Harvest",
+          "start_day": 106,
+          "end_day": 120,
+          "key_activities": [
+            "Harvest at breaker or pink stage for distant markets, red ripe for local sale.",
+            "Pick in early morning; place fruits in shaded crates.",
+            "Grade by size and remove cracked or bruised fruits."
+          ],
+          "common_diseases": ["Post-harvest rot"],
+          "recommended_fertilizer": "None."
+        }
+      ],
+      "top_diseases": [
+        {"name": "Early blight", "symptoms": "Brown concentric-ring spots on older leaves spreading upward."},
+        {"name": "Leaf curl virus", "symptoms": "Upward curling and yellowing of young leaves; stunted plants. Spread by whitefly."},
+        {"name": "Bacterial wilt", "symptoms": "Sudden wilting of green plants; cut stem oozes a white bacterial stream in water."}
+      ],
+      "harvest_window_indicators": "Start picking 65-75 days after transplanting when fruit shoulders turn from green to light pink.",
+      "storage_tip": "Store ripe fruit at room temperature in a single layer, shaded and ventilated, for up to 5-7 days."
+    },
+    {
+      "id": "groundnut",
+      "name": "Groundnut",
+      "varieties": ["TMV 7", "VRI 2", "CO 7"],
+      "total_duration_days": 110,
+      "stages": [
+        {
+          "id": "sowing",
+          "name": "Sowing and Germination",
+          "start_day": 0,
+          "end_day": 15,
+          "key_activities": [
+            "Treat kernels with rhizobium and Trichoderma before sowing.",
+            "Sow 30 x 10 cm spacing at 4-5 cm depth in moist soil.",
+            "Apply gypsum and basal fertilizer in furrows."
+          ],
+          "common_diseases": ["Seed rot", "Collar rot"],
+          "recommended_fertilizer": "Basal: 25 kg Urea + 100 kg SSP + 45 kg MOP + 400 kg gypsum per hectare."
+        },
+        {
+          "id": "vegetative",
+          "name": "Vegetative Growth",
+          "start_day": 16,
+          "end_day": 40,
+          "key_activities": [
+            "Hand-weed at 20 and 35 days after sowing.",
+            "Light earthing-up to encourage peg formation.",
+            "Irrigate at 10-12 day intervals if no rain."
+          ],
+          "common_diseases": ["Tikka leaf spot", "Leaf miner"],
+          "recommended_fertilizer": "No top-dress nitrogen needed; legume fixes its own."
+        },
+        {
+          "id": "flowering_pegging",
+          "name": "Flowering and Pegging",
+          "start_day": 41,
+          "end_day": 65,
+          "key_activities": [
+            "Do NOT disturb the soil once pegs start entering it.",
+            "Apply 200 kg gypsum per hectare on the row at peak flowering.",
+            "Ensure even soil moisture; stress now reduces pod set."
+          ],
+          "common_diseases": ["Bud necrosis virus", "Tikka spot"],
+          "recommended_fertilizer": "Gypsum 200 kg per hectare top-dress at flowering."
+        },
+        {
+          "id": "pod_development",
+          "name": "Pod Development",
+          "start_day": 66,
+          "end_day": 95,
+          "key_activities": [
+            "Irrigate every 8-10 days; this is the most critical water stage.",
+            "Scout for late leaf spot and rust; spray Mancozeb if 10% leaves affected.",
+            "Hand-pull weeds; do not hoe between rows."
+          ],
+          "common_diseases": ["Late leaf spot", "Rust", "Aflatoxin (storage)"],
+          "recommended_fertilizer": "Foliar 2% urea spray if leaves pale."
+        },
+        {
+          "id": "maturity_harvest",
+          "name": "Maturity and Harvest",
+          "start_day": 96,
+          "end_day": 110,
+          "key_activities": [
+            "Check 4-5 sample plants; harvest when 70-75% pods show dark veins inside the shell.",
+            "Pull plants when soil is slightly moist to keep pods attached.",
+            "Sun-dry pods on a clean tarpaulin to 8-9% moisture."
+          ],
+          "common_diseases": ["Aflatoxin contamination if pods stay damp"],
+          "recommended_fertilizer": "None."
+        }
+      ],
+      "top_diseases": [
+        {"name": "Tikka leaf spot", "symptoms": "Round brown spots with yellow halo on leaves; severe defoliation."},
+        {"name": "Rust", "symptoms": "Reddish-brown powdery pustules on the underside of leaves."},
+        {"name": "Bud necrosis virus", "symptoms": "Necrotic ring spots on young leaves; bud death and bunchy top."}
+      ],
+      "harvest_window_indicators": "Pull at 100-110 days when leaves yellow and 70%+ pod insides show dark vein pattern and firm kernels.",
+      "storage_tip": "Dry pods to 8% moisture and store in clean, dry bags off the floor; high moisture causes aflatoxin."
+    },
+    {
+      "id": "banana",
+      "name": "Banana",
+      "varieties": ["Poovan", "Nendran", "Grand Naine (G9)", "Robusta"],
+      "total_duration_days": 360,
+      "stages": [
+        {
+          "id": "planting_establishment",
+          "name": "Planting and Establishment",
+          "start_day": 0,
+          "end_day": 60,
+          "key_activities": [
+            "Plant disease-free tissue-culture or sword suckers in 45 x 45 x 45 cm pits.",
+            "Apply FYM and basal fertilizer in the pit before planting.",
+            "Irrigate immediately and weekly until shoots harden."
+          ],
+          "common_diseases": ["Panama wilt", "Nematodes"],
+          "recommended_fertilizer": "Basal per pit: 10 kg FYM + 100 g Urea + 250 g SSP + 100 g MOP."
+        },
+        {
+          "id": "vegetative",
+          "name": "Vegetative Growth",
+          "start_day": 61,
+          "end_day": 180,
+          "key_activities": [
+            "Remove unwanted suckers; keep one healthy follower per mat.",
+            "Mulch the basin with dried leaves to conserve moisture.",
+            "Apply nitrogen and potash in 4-6 split doses."
+          ],
+          "common_diseases": ["Sigatoka leaf spot", "Banana aphid"],
+          "recommended_fertilizer": "Per plant total: 200 g N + 60 g P + 300 g K, split monthly."
+        },
+        {
+          "id": "flowering_shooting",
+          "name": "Flowering and Shooting",
+          "start_day": 181,
+          "end_day": 240,
+          "key_activities": [
+            "Stake the pseudostem to prevent lodging once the bunch emerges.",
+            "Remove the male bud (navel) one week after the last hand opens.",
+            "Cover the bunch with a perforated polythene sleeve."
+          ],
+          "common_diseases": ["Bunchy top virus", "Sigatoka"],
+          "recommended_fertilizer": "Last potash split 100 g MOP per plant at shooting."
+        },
+        {
+          "id": "bunch_development",
+          "name": "Bunch Development",
+          "start_day": 241,
+          "end_day": 330,
+          "key_activities": [
+            "Irrigate regularly; water stress now reduces finger size.",
+            "Inspect weekly for thrips and corm weevil.",
+            "Prop heavy bunches with bamboo to prevent breakage."
+          ],
+          "common_diseases": ["Anthracnose", "Thrips"],
+          "recommended_fertilizer": "Foliar 1% MOP spray if finger filling is weak."
+        },
+        {
+          "id": "harvest",
+          "name": "Harvest",
+          "start_day": 331,
+          "end_day": 360,
+          "key_activities": [
+            "Harvest at three-quarter maturity (fingers angular but rounding).",
+            "Cut the bunch carefully; do not let it fall on the ground.",
+            "De-hand only after 24 hours of latex drainage."
+          ],
+          "common_diseases": ["Crown rot post-harvest", "Anthracnose"],
+          "recommended_fertilizer": "None."
+        }
+      ],
+      "top_diseases": [
+        {"name": "Panama wilt (Fusarium)", "symptoms": "Yellowing and collapse of older leaves around pseudostem; reddish-brown vascular streaks inside corm."},
+        {"name": "Sigatoka leaf spot", "symptoms": "Yellow streaks turning to brown elliptical spots with grey centres on leaves."},
+        {"name": "Bunchy top virus", "symptoms": "Narrow upright bunched leaves at top; dark green dot-dash streaks on midrib. Spread by aphid."}
+      ],
+      "harvest_window_indicators": "Harvest when fingers are 75% mature, slightly angular, and 90-110 days after shooting depending on variety.",
+      "storage_tip": "Keep harvested bunches in a cool, shaded, well-ventilated area; do not stack tightly. Ripen at 15-18 C."
+    },
+    {
+      "id": "onion",
+      "name": "Onion",
+      "varieties": ["CO 4", "Agrifound Light Red", "Bhima Super"],
+      "total_duration_days": 130,
+      "stages": [
+        {
+          "id": "nursery",
+          "name": "Nursery",
+          "start_day": 0,
+          "end_day": 45,
+          "key_activities": [
+            "Sow seeds on raised beds; cover lightly with sieved FYM.",
+            "Water with a fine rose-can twice a day in summer.",
+            "Drench beds with copper oxychloride if damping-off appears."
+          ],
+          "common_diseases": ["Damping-off", "Onion thrips"],
+          "recommended_fertilizer": "FYM 2 kg + 20 g DAP per sq m of nursery bed."
+        },
+        {
+          "id": "transplant_establishment",
+          "name": "Transplanting and Establishment",
+          "start_day": 46,
+          "end_day": 65,
+          "key_activities": [
+            "Transplant 40-45 day-old seedlings at 15 x 10 cm spacing.",
+            "Irrigate immediately and again on day 3.",
+            "Apply basal fertilizer in the furrow before planting."
+          ],
+          "common_diseases": ["Basal rot", "Thrips"],
+          "recommended_fertilizer": "Basal: 30 kg Urea + 125 kg SSP + 65 kg MOP per hectare."
+        },
+        {
+          "id": "vegetative",
+          "name": "Vegetative Growth",
+          "start_day": 66,
+          "end_day": 95,
+          "key_activities": [
+            "Hand-weed twice; do not hoe deep, roots are shallow.",
+            "Irrigate every 7-10 days, keep soil evenly moist.",
+            "Scout weekly for thrips; treat early."
+          ],
+          "common_diseases": ["Thrips", "Purple blotch"],
+          "recommended_fertilizer": "Top-dress 30 kg Urea per hectare at 30 DAT."
+        },
+        {
+          "id": "bulb_development",
+          "name": "Bulb Development",
+          "start_day": 96,
+          "end_day": 115,
+          "key_activities": [
+            "Stop nitrogen; excess N delays bulb formation and softens skin.",
+            "Reduce irrigation frequency to harden the bulbs.",
+            "Spray Mancozeb if purple blotch lesions appear."
+          ],
+          "common_diseases": ["Purple blotch", "Stemphylium blight"],
+          "recommended_fertilizer": "Foliar 1% potassium sulphate to improve skin colour."
+        },
+        {
+          "id": "maturity_harvest",
+          "name": "Maturity and Harvest",
+          "start_day": 116,
+          "end_day": 130,
+          "key_activities": [
+            "Stop irrigation 10-15 days before harvest.",
+            "Lift bulbs when 50-70% of tops fall over and necks soften.",
+            "Cure bulbs in shade for 7-10 days before storage."
+          ],
+          "common_diseases": ["Black mould (storage)", "Neck rot"],
+          "recommended_fertilizer": "None."
+        }
+      ],
+      "top_diseases": [
+        {"name": "Purple blotch", "symptoms": "Small white sunken spots on leaves enlarging to purple zonate lesions; tips die back."},
+        {"name": "Thrips damage", "symptoms": "Silvery-white streaks and curled leaves; tiny yellow insects inside leaf folds."},
+        {"name": "Basal rot", "symptoms": "Yellowing and wilting of leaves; soft rotted base with white fungal growth on the basal plate."}
+      ],
+      "harvest_window_indicators": "Harvest when 50-70% of tops have fallen over, necks are soft, and outer scales are dry and coloured.",
+      "storage_tip": "After 7-10 days of shade curing, store bulbs in well-ventilated bamboo crates in a cool dry place; avoid stacking over 60 cm."
+    },
+    {
+      "id": "sugarcane",
+      "name": "Sugarcane",
+      "varieties": ["CO 86032", "CO 0238", "CO 11015"],
+      "total_duration_days": 360,
+      "stages": [
+        {
+          "id": "planting_germination",
+          "name": "Planting and Germination",
+          "start_day": 0,
+          "end_day": 45,
+          "key_activities": [
+            "Use 3-budded setts from healthy 9-10 month-old cane.",
+            "Treat setts with carbendazim and hot-water if available.",
+            "Plant in furrows 90 cm apart; cover with 3-5 cm soil."
+          ],
+          "common_diseases": ["Sett rot", "Pineapple disease of sett"],
+          "recommended_fertilizer": "Basal: 75 kg Urea + 250 kg SSP + 120 kg MOP per hectare."
+        },
+        {
+          "id": "tillering",
+          "name": "Tillering",
+          "start_day": 46,
+          "end_day": 120,
+          "key_activities": [
+            "First top-dress nitrogen at 45 days; second at 90 days.",
+            "Hand-weed or use pre-emergence herbicide; keep field weed-free.",
+            "Irrigate every 10-12 days in dry season."
+          ],
+          "common_diseases": ["Early shoot borer", "Smut"],
+          "recommended_fertilizer": "Two splits of 75 kg Urea per hectare at 45 and 90 days."
+        },
+        {
+          "id": "grand_growth",
+          "name": "Grand Growth",
+          "start_day": 121,
+          "end_day": 270,
+          "key_activities": [
+            "Earth-up rows at 120 and 150 days to support stalks.",
+            "Tie 4-5 canes from adjacent rows to prevent lodging.",
+            "Maintain regular irrigation; this stage forms most of the cane weight."
+          ],
+          "common_diseases": ["Red rot", "Top borer", "Wooly aphid"],
+          "recommended_fertilizer": "Final 75 kg Urea + 60 kg MOP per hectare top-dress at 120 days."
+        },
+        {
+          "id": "maturation",
+          "name": "Maturation and Ripening",
+          "start_day": 271,
+          "end_day": 330,
+          "key_activities": [
+            "Reduce irrigation gradually 30 days before harvest to raise sugar content.",
+            "Strip dry lower leaves to improve airflow and reduce rats.",
+            "Test brix; harvest when juice brix reaches 18-20%."
+          ],
+          "common_diseases": ["Red rot", "Smut whip"],
+          "recommended_fertilizer": "None. Optional foliar 1% KCl if leaves yellow."
+        },
+        {
+          "id": "harvest",
+          "name": "Harvest",
+          "start_day": 331,
+          "end_day": 360,
+          "key_activities": [
+            "Cut canes at ground level; trim tops and tie in bundles.",
+            "Transport to mill within 24 hours of cutting to avoid sucrose loss.",
+            "Plan ratoon management within a week of harvest."
+          ],
+          "common_diseases": ["Post-harvest sucrose inversion"],
+          "recommended_fertilizer": "None for plant crop; ratoon needs 25% extra N."
+        }
+      ],
+      "top_diseases": [
+        {"name": "Red rot", "symptoms": "Reddened internal pith with cross-wise white patches; sour smell; leaves dry from top."},
+        {"name": "Smut", "symptoms": "Long black whip-like structure emerging from the top of the shoot; thin sickly tillers."},
+        {"name": "Early shoot borer", "symptoms": "Dead heart in young shoots; central whorl dries while outer leaves stay green."}
+      ],
+      "harvest_window_indicators": "Harvest at 10-12 months when juice brix is 18-20%, lower leaves dry, and stalks sound metallic when tapped.",
+      "storage_tip": "Sugarcane does not store well after cutting; crush within 24-48 hours. For seed setts, keep bundles upright in shade and moisten lightly."
+    }
+  ]
+}

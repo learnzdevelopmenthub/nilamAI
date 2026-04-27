@@ -4,8 +4,8 @@ import 'package:nilam_ai/services/llm/response_post_processor.dart';
 void main() {
   group('ResponsePostProcessor.process — markdown stripping', () {
     test('strips bold markers', () {
-      final out = ResponsePostProcessor.process('இது **முக்கியம்** ஆகும்.');
-      expect(out, equals('இது முக்கியம் ஆகும்.'));
+      final out = ResponsePostProcessor.process('It is **important** to apply.');
+      expect(out, equals('It is important to apply.'));
     });
 
     test('strips italic markers (underscore)', () {
@@ -14,15 +14,13 @@ void main() {
     });
 
     test('strips headers', () {
-      final out = ResponsePostProcessor.process('## தலைப்பு\nதகவல்.');
-      expect(out, contains('தலைப்பு'));
+      final out = ResponsePostProcessor.process('## Title\nBody.');
+      expect(out, contains('Title'));
       expect(out.contains('##'), isFalse);
     });
 
     test('strips inline backticks', () {
       final out = ResponsePostProcessor.process('Use `kubectl` command.');
-      // "kubectl" becomes whole-word after backtick strip — no abbreviation
-      // match (not in map).
       expect(out.contains('`'), isFalse);
       expect(out, contains('kubectl'));
     });
@@ -60,36 +58,6 @@ void main() {
     });
   });
 
-  group('ResponsePostProcessor.process — abbreviation expansion', () {
-    test('expands kg to கிலோ', () {
-      final out = ResponsePostProcessor.process('5 kg விதை போடு.');
-      expect(out, equals('5 கிலோ விதை போடு.'));
-    });
-
-    test('expands Rs to ரூபாய்', () {
-      final out = ResponsePostProcessor.process('விலை Rs 500.');
-      expect(out, contains('ரூபாய்'));
-      expect(out.contains(RegExp(r'\bRs\b')), isFalse);
-    });
-
-    test('expands ₹ currency symbol', () {
-      final out = ResponsePostProcessor.process('விலை ₹500.');
-      expect(out, contains('ரூபாய்'));
-      expect(out.contains('₹'), isFalse);
-    });
-
-    test('expands ha (hectare)', () {
-      final out = ResponsePostProcessor.process('1 ha நிலம்');
-      expect(out, contains('ஹெக்டேர்'));
-    });
-
-    test('does not expand abbreviations inside words', () {
-      // "kgf" should not have "kg" replaced.
-      final out = ResponsePostProcessor.process('kgfoobar');
-      expect(out, equals('kgfoobar'));
-    });
-  });
-
   group('ResponsePostProcessor.process — whitespace', () {
     test('preserves single paragraph breaks', () {
       const input = 'Para one.\n\nPara two.';
@@ -115,19 +83,19 @@ void main() {
   });
 
   group('ResponsePostProcessor.process — combined pipeline', () {
-    test('handles markdown + abbreviation + whitespace in one pass', () {
-      const input = '## தலைப்பு\n\n**5 kg** விதை போடு.\n\n\n- முதல் படி';
+    test('handles markdown + whitespace in one pass', () {
+      const input = '## Title\n\n**Apply 5 kg** of seed.\n\n\n- First step';
       final out = ResponsePostProcessor.process(input);
-      expect(out, contains('தலைப்பு'));
-      expect(out, contains('5 கிலோ விதை போடு.'));
-      expect(out, contains('முதல் படி'));
+      expect(out, contains('Title'));
+      expect(out, contains('Apply 5 kg of seed.'));
+      expect(out, contains('First step'));
       expect(out.contains('##'), isFalse);
       expect(out.contains('**'), isFalse);
       expect(out.contains('- '), isFalse);
     });
 
     test('is idempotent on clean input', () {
-      const clean = 'சுத்தமான தமிழ் பதில்.';
+      const clean = 'A clean English response.';
       expect(ResponsePostProcessor.process(clean), equals(clean));
     });
   });

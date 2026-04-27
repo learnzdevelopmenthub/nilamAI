@@ -1,8 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../services/database/database_service.dart';
-import '../services/database/daos/user_profile_dao.dart';
+import '../services/database/daos/crop_profile_dao.dart';
 import '../services/database/daos/query_history_dao.dart';
+import '../services/database/daos/user_profile_dao.dart';
+import '../services/database/database_service.dart';
+import '../services/database/models/crop_profile.dart';
 import '../services/database/models/query_history.dart';
 
 /// Provides the initialized [DatabaseService].
@@ -30,6 +32,11 @@ final userProfileDaoProvider = Provider<UserProfileDao>((ref) {
 /// Convenience provider for [QueryHistoryDao].
 final queryHistoryDaoProvider = Provider<QueryHistoryDao>((ref) {
   return ref.watch(databaseServiceProvider).queryHistoryDao;
+});
+
+/// Convenience provider for [CropProfileDao].
+final cropProfileDaoProvider = Provider<CropProfileDao>((ref) {
+  return ref.watch(databaseServiceProvider).cropProfileDao;
 });
 
 /// Loads a single [QueryHistory] by id. Returns `null` if not found.
@@ -73,4 +80,16 @@ final historyQueriesProvider =
     return dao.searchByKeyword(keyword, userId: query.userId, limit: 50);
   }
   return dao.getByUserId(query.userId, limit: 50);
+});
+
+/// All crop profiles for the given user, active first.
+final userCropProfilesProvider =
+    FutureProvider.family<List<CropProfile>, String>((ref, userId) async {
+  return ref.watch(cropProfileDaoProvider).getByUserId(userId);
+});
+
+/// Single crop profile by id.
+final cropProfileByIdProvider =
+    FutureProvider.family<CropProfile?, String>((ref, id) async {
+  return ref.watch(cropProfileDaoProvider).getById(id);
 });

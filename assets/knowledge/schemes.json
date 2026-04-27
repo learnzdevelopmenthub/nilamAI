@@ -1,0 +1,89 @@
+{
+  "version": 1,
+  "generated_at": "2026-04-27",
+  "schemes": [
+    {
+      "id": "pm_kisan",
+      "name": "PM-KISAN (Pradhan Mantri Kisan Samman Nidhi)",
+      "type": "income_support",
+      "benefit_summary": "Direct income support of Rs. 6000 per year, paid in three Rs. 2000 instalments to your bank account.",
+      "eligibility_criteria": [
+        "Must be a small or marginal farmer holding cultivable land in your name.",
+        "Total land holding must be 2 hectares (about 5 acres) or less, as per state land records.",
+        "Must have an Aadhaar number linked to an active bank account.",
+        "Income tax payers, government employees, and pensioners drawing over Rs. 10,000 per month are excluded."
+      ],
+      "application_steps": [
+        "1. Visit the PM-KISAN portal or your nearest Common Service Centre (CSC).",
+        "2. Click 'New Farmer Registration' and enter your Aadhaar, mobile number, and state.",
+        "3. Fill land ownership details exactly as they appear on your patta or pahani.",
+        "4. Upload a scanned bank passbook page and submit.",
+        "5. Track approval status under 'Beneficiary Status' using your Aadhaar number."
+      ],
+      "apply_url": "https://pmkisan.gov.in/",
+      "max_land_acres_for_eligibility": 5.0
+    },
+    {
+      "id": "pmfby",
+      "name": "PMFBY (Pradhan Mantri Fasal Bima Yojana)",
+      "type": "insurance",
+      "benefit_summary": "Subsidised crop insurance against drought, flood, pest attack and post-harvest losses, with the farmer paying only 1.5 to 2 percent of the sum insured.",
+      "eligibility_criteria": [
+        "Open to all farmers, including sharecroppers and tenant farmers, growing notified crops in notified areas.",
+        "Compulsory for farmers who have taken a Kisan Credit Card or seasonal crop loan; voluntary for others.",
+        "Must enrol before the cut-off date set for the season (Kharif or Rabi) by your state.",
+        "Land records or a tenancy certificate proving cultivation rights are required."
+      ],
+      "application_steps": [
+        "1. Visit the National Crop Insurance Portal or your nearest bank, PACS, or CSC.",
+        "2. Choose Kharif or Rabi season and select your notified crop.",
+        "3. Enter survey number, area sown, and upload land record plus bank passbook.",
+        "4. Pay the farmer share of the premium online or at the bank.",
+        "5. Save the policy receipt; report any crop loss within 72 hours via the Crop Insurance app."
+      ],
+      "apply_url": "https://pmfby.gov.in/",
+      "max_land_acres_for_eligibility": null
+    },
+    {
+      "id": "tn_crop_loan",
+      "name": "Tamil Nadu State Crop Loan (Kisan Credit Card)",
+      "type": "credit",
+      "benefit_summary": "Short-term crop loan up to Rs. 3 lakh at 4 percent effective interest after state and central interest subvention, via cooperative or commercial banks in Tamil Nadu.",
+      "eligibility_criteria": [
+        "Must be a resident farmer of Tamil Nadu cultivating land in your name or as a registered tenant.",
+        "Loan amount is calculated from a state-fixed scale of finance based on crop and acreage.",
+        "Must have a clean credit record with the cooperative society or bank.",
+        "Loan must be repaid within the crop season to keep the 4 percent subsidised rate."
+      ],
+      "application_steps": [
+        "1. Visit your nearest Primary Agricultural Cooperative Credit Society (PACCS) or commercial bank branch.",
+        "2. Apply for a Kisan Credit Card with land patta, chitta, Aadhaar, and a passport-size photo.",
+        "3. Bank officials inspect the land and fix the loan limit per the scale of finance.",
+        "4. Sign the loan agreement and collect the KCC and passbook.",
+        "5. Withdraw against the limit each season and repay within 12 months to retain the subsidy."
+      ],
+      "apply_url": "https://www.tn.gov.in/scheme/data_view/8851",
+      "max_land_acres_for_eligibility": 12.5
+    },
+    {
+      "id": "soil_health_card",
+      "name": "Soil Health Card Scheme",
+      "type": "advisory",
+      "benefit_summary": "Free soil testing every two years with a printed Soil Health Card listing nutrient status and crop-wise fertiliser recommendations.",
+      "eligibility_criteria": [
+        "Open to every Indian farmer, with no land size limit.",
+        "Land must be cultivable and identifiable by survey number.",
+        "Soil sample must be collected as per the prescribed grid (one sample per 2.5 hectares irrigated or 10 hectares rain-fed)."
+      ],
+      "application_steps": [
+        "1. Contact your block-level Agriculture Officer or Krishi Vigyan Kendra.",
+        "2. Request soil sample collection for your survey number; an officer will visit and collect samples.",
+        "3. Samples are sent to a state soil testing lab; results are uploaded to the Soil Health Card portal.",
+        "4. Collect the printed card from the agriculture office or download it from the portal.",
+        "5. Follow the crop-wise fertiliser recommendations printed on the card for the next two seasons."
+      ],
+      "apply_url": "https://soilhealth.dac.gov.in/",
+      "max_land_acres_for_eligibility": null
+    }
+  ]
+}

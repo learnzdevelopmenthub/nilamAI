@@ -51,8 +51,8 @@ class HomeScreen extends ConsumerWidget {
               SizedBox(
                 height: 72,
                 child: ElevatedButton.icon(
-                  onPressed: () => context.push('/record'),
-                  icon: const Icon(Icons.mic, size: 28),
+                  onPressed: () => context.push('/ask'),
+                  icon: const Icon(Icons.edit, size: 28),
                   label: const Text(
                     TamilStrings.askQuestionCta,
                     style: TextStyle(fontSize: 18),

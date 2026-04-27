@@ -1,130 +1,195 @@
-/// Tamil string constants for NilamAI UI.
+/// English UI string constants for NilamAI.
 ///
-/// All user-facing Tamil text should be defined here for
-/// consistency and future i18n support.
+/// Class name `TamilStrings` is kept for backwards compatibility with the
+/// 60+ existing call sites; values were swapped to English when the demo
+/// scope shifted to English-only output. STT/recording keys have been
+/// removed with the voice pipeline.
 class TamilStrings {
   TamilStrings._();
 
   // -- App --
-  static const String appName = 'நிலம்AI';
-  static const String appTagline = 'உங்கள் விவசாய உதவியாளர்';
+  static const String appName = 'NilamAI';
+  static const String appTagline = 'AI that grows with your land';
 
   // -- Greetings --
-  static const String greeting = 'வணக்கம்!';
+  static const String greeting = 'Hello!';
 
   // -- Navigation --
-  static const String home = 'முகப்பு';
-  static const String settings = 'அமைப்புகள்';
-  static const String history = 'வரலாறு';
-  static const String help = 'உதவி';
+  static const String home = 'Home';
+  static const String settings = 'Settings';
+  static const String history = 'History';
+  static const String help = 'Help';
 
   // -- Actions --
-  static const String askQuestion = 'கேள்வி கேளுங்கள்';
-  static const String record = 'பதிவு செய்';
-  static const String stop = 'நிறுத்து';
-  static const String play = 'இயக்கு';
-  static const String retry = 'மீண்டும் முயற்சிக்கவும்';
-  static const String cancel = 'ரத்து செய்';
-  static const String save = 'சேமி';
-  static const String delete = 'நீக்கு';
+  static const String askQuestion = 'Ask a question';
+  static const String play = 'Play';
+  static const String stop = 'Stop';
+  static const String retry = 'Retry';
+  static const String cancel = 'Cancel';
+  static const String save = 'Save';
+  static const String delete = 'Delete';
+  static const String confirm = 'Submit';
+  static const String add = 'Add';
+  static const String done = 'Done';
+  static const String close = 'Close';
 
   // -- Status --
-  static const String loading = 'ஏற்றுகிறது...';
-  static const String listening = 'கேட்கிறேன்...';
-  static const String processing = 'செயலாக்குகிறது...';
-  static const String ready = 'தயார்';
-
-  // -- Recording --
-  static const String recordingTitle = 'உங்கள் கேள்வியைக் கேளுங்கள்';
-  static const String tapToRecord = 'பதிவு செய்ய தட்டுங்கள்';
-  static const String recordingActive = 'பதி���ு செய்கிறது...';
-  static const String recordingComplete = 'பதி��ு முடிந்தது';
-
-  // -- Permissions --
-  static const String micPermissionNeeded = 'மைக்ரோஃபோன் அனுமதி தேவை';
-  static const String micPermissionExplain =
-      'உங்கள் குரலை பதிவு செய்ய மைக்ரோஃபோன் அனுமதி அவசியம்';
-  static const String openSettings = 'அமைப்புகளைத் திற';
-
-  // -- Quality warnings --
-  static const String warningTooQuiet =
-      'சத்தம் குறைவாக உள்ளது. சற்று சத்தமாகப் ப���சுங்கள்';
-  static const String warningClipping =
-      'சத்தம் அதிகமாக உள்��து. சற்று மெதுவாகப் பேசுங்கள்';
+  static const String loading = 'Loading…';
+  static const String processing = 'Processing…';
+  static const String ready = 'Ready';
 
   // -- Errors --
-  static const String errorGeneral = 'பிழை ஏற்பட்டது. மீண்டும் முயற்சிக்கவும்.';
-  static const String errorMicrophone = 'மைக்ரோஃபோன் அணுக முடியவில்லை';
-  static const String errorNetwork = 'இணைய இணைப்பு இல்லை';
-  static const String errorCodecUnsupported =
-      'இந்த சாதனத்தில் ஒலி பதிவு ஆதரிக்கப்படவில்லை';
-  static const String errorRecordingFailed =
-      'பதிவு தோல்வி. மீண்டும் முயற்சிக்கவும்';
-  static const String errorMaxDuration = 'அதிகபட்ச நேரம் எட்டப்பட்டத���';
-  static const String errorDatabase = 'தரவுத்தள பிழை. மீண்டும் முயற்சிக்கவும்.';
-  static const String errorDatabaseInit = 'தரவுத்தளத்தை துவக்க முடியவில்லை';
-
-  // -- STT (Speech-to-Text) --
-  static const String sttTranscribing = 'உரையாக மாற்றுகிறது...';
-  static const String sttModelLoading = 'மாதிரி ஏற்றப்படுகிறது...';
-
-  // -- Transcription review --
-  static const String reviewTitle = 'பதிவு செய்த உரை';
-  static const String reviewInstructions = 'தவறு இருந்தால் திருத்தவும்';
-  static const String confirm = 'உறுதிசெய்';
-  static const String retake = 'மீண்டும் பதிவு செய்';
-  static const String transcriptionEmpty = 'எந்த உரையும் கண்டறியப்படவில்லை';
-  static const String transcriptionSaved = 'சேமிக்கப்பட்டது';
-
-  // -- STT errors (E006/E007/E008) --
-  static const String errorSttModelMissing =
-      'பேச்சு அறிதல் மாதிரி கிடைக்கவில்லை';
-  static const String errorSttFailed =
-      'உரை மாற்றம் தோல்வி. மீண்டும் முயற்சிக்கவும்';
-  static const String errorSttLowConfidence =
-      'உரை தெளிவாக இல்லை. திருத்தவும்';
+  static const String errorGeneral = 'Something went wrong. Please try again.';
+  static const String errorNetwork = 'No internet connection.';
+  static const String errorDatabase = 'Database error. Please try again.';
+  static const String errorDatabaseInit = 'Could not initialize the database.';
 
   // -- Home --
-  static const String homeTitle = 'நிலம்AI';
-  static const String recentQuestions = 'சமீபத்திய கேள்விகள்';
-  static const String noRecentQuestions = 'இன்னும் கேள்விகள் இல்லை';
-  static const String askQuestionCta = '🎤 கேள்வி கேளுங்கள்';
+  static const String homeTitle = 'NilamAI';
+  static const String recentQuestions = 'Recent questions';
+  static const String noRecentQuestions = 'No questions yet';
+  static const String askQuestionCta = '✏️ Ask a question';
+  static const String queryInputHint = 'Type your question here…';
+  static const String quickActions = 'Quick actions';
+  static const String activeCrops = 'My crops';
+  static const String noActiveCrops = 'No crops added yet';
 
   // -- Response --
-  static const String responseTitle = 'பதில்';
-  static const String yourQuestion = 'உங்கள் கேள்வி';
-  static const String aiResponse = 'AI பதில்';
-  static const String responsePlaceholder = '🌾 AI பதில் விரைவில் வரும்...';
-  static const String gemmaLoadingModel = 'AI மாதிரி ஏற்றப்படுகிறது...';
-  static const String gemmaGenerating = 'AI பதிலை உருவாக்குகிறது...';
-  static const String gemmaError = 'AI பதில் கிடைக்கவில்லை';
-  static const String gemmaGenerateAnswer = '✨ AI பதிலைப் பெறு';
-  static const String audioComingSoon = '🔊 விரைவில் வரும்';
-  static const String helpful = '👍 பயனுள்ளது';
-  static const String notHelpful = '👎 பயனில்லை';
-  static const String ratingSaved = 'மதிப்பீடு சேமிக்கப்பட்டது';
-  static const String goHome = '🔙 முகப்பு';
-  static const String playSpeed = 'வேகம்';
-  static const String queryNotFound = 'கேள்வி கிடைக்கவில்லை';
+  static const String responseTitle = 'Answer';
+  static const String yourQuestion = 'Your question';
+  static const String aiResponse = 'AI answer';
+  static const String responsePlaceholder = '🌾 The AI answer will appear here…';
+  static const String gemmaLoadingModel = 'Loading AI model…';
+  static const String gemmaGenerating = 'Thinking…';
+  static const String gemmaError = 'AI answer unavailable';
+  static const String gemmaGenerateAnswer = '✨ Get AI answer';
+  static const String audioComingSoon = '🔊 Tap play to listen';
+  static const String helpful = '👍 Helpful';
+  static const String notHelpful = '👎 Not helpful';
+  static const String ratingSaved = 'Rating saved';
+  static const String goHome = '🔙 Home';
+  static const String playSpeed = 'Speed';
+  static const String queryNotFound = 'Question not found';
+  static const String readAloud = 'Read aloud';
 
   // -- History --
-  static const String historyTitle = 'வரலாறு';
-  static const String searchHint = 'தேடுக...';
-  static const String historyEmpty = '📜 இன்னும் கேள்விகள் இல்லை';
-  static const String deleteConfirmTitle = 'நீக்க வேண்டுமா?';
+  static const String historyTitle = 'History';
+  static const String searchHint = 'Search…';
+  static const String historyEmpty = '📜 No questions yet';
+  static const String deleteConfirmTitle = 'Delete?';
   static const String deleteConfirmMessage =
-      'இந்த கேள்வியை நிரந்தரமாக நீக்க விரும்புகிறீர்களா?';
-  static const String deleted = 'நீக்கப்பட்டது';
+      'Permanently delete this question?';
+  static const String deleted = 'Deleted';
 
   // -- Settings --
-  static const String settingsTitle = 'அமைப்புகள்';
-  static const String ttsSpeedLabel = 'குரல் வேகம்';
-  static const String notificationsLabel = 'அறிவிப்புகள்';
-  static const String clearHistoryLabel = '🗑️ வரலாற்றை அழி';
-  static const String clearHistoryConfirmTitle = 'வரலாற்றை அழிக்க வேண்டுமா?';
+  static const String settingsTitle = 'Settings';
+  static const String ttsSpeedLabel = 'Voice speed';
+  static const String notificationsLabel = 'Notifications';
+  static const String clearHistoryLabel = '🗑️ Clear history';
+  static const String clearHistoryConfirmTitle = 'Clear history?';
   static const String clearHistoryConfirmMessage =
-      'அனைத்து கேள்விகளும் நிரந்தரமாக நீக்கப்படும்.';
-  static const String historyCleared = 'வரலாறு அழிக்கப்பட்டது';
-  static const String aboutLabel = 'பற்றி';
-  static const String versionLabel = 'பதிப்பு';
+      'All saved questions will be permanently deleted.';
+  static const String historyCleared = 'History cleared';
+  static const String aboutLabel = 'About';
+  static const String versionLabel = 'Version';
+  static const String landAreaSetting = 'Land area (acres)';
+  static const String landAreaHint = 'Used for scheme eligibility';
+
+  // -- Bottom navigation --
+  static const String navHome = 'Home';
+  static const String navCrops = 'Crops';
+  static const String navDiagnose = 'Diagnose';
+  static const String navMarket = 'Market';
+  static const String navSchemes = 'Schemes';
+
+  // -- Crop profiles --
+  static const String cropsTitle = 'My crops';
+  static const String addCropTitle = 'Add crop';
+  static const String editCropTitle = 'Edit crop';
+  static const String selectCropType = 'Crop type';
+  static const String cropVariety = 'Variety (optional)';
+  static const String sowingDate = 'Sowing date';
+  static const String landAreaAcres = 'Land area (acres)';
+  static const String soilType = 'Soil type (optional)';
+  static const String irrigationType = 'Irrigation (optional)';
+  static const String saveCrop = 'Save crop';
+  static const String deleteCrop = 'Delete crop';
+  static const String deleteCropConfirm = 'Delete this crop and its history?';
+  static const String currentStage = 'Current stage';
+  static const String dayOfStage = 'Day';
+  static const String daysToHarvest = 'Days to harvest';
+  static const String harvestExpected = 'Expected harvest';
+  static const String stageActivities = 'What to do now';
+  static const String stageDiseasesWatch = 'Watch for these problems';
+  static const String stageFertilizer = 'Recommended fertilizer';
+  static const String topDiseases = 'Common diseases';
+  static const String harvestIndicators = 'When to harvest';
+  static const String storageTip = 'Storage tip';
+  static const String noCropsTitle = 'Track your first crop';
+  static const String noCropsBody =
+      'Add a crop to get stage-based reminders and AI advice tailored to your field.';
+  static const String addFirstCrop = 'Add a crop';
+  static const String openTimeline = 'View timeline';
+  static const String askAboutThisCrop = 'Ask about this crop';
+  static const String diagnoseFromCrop = 'Diagnose disease';
+
+  // -- Disease diagnosis --
+  static const String diagnoseTitle = 'Disease diagnosis';
+  static const String diagnoseSubtitle =
+      'Take or upload a leaf photo, and optionally describe what you see.';
+  static const String capturePhoto = 'Take photo';
+  static const String chooseFromGallery = 'Choose from gallery';
+  static const String describeSymptoms = 'Describe symptoms';
+  static const String symptomsHint =
+      'Optional. e.g., yellow diamond-shaped patches on rice leaves…';
+  static const String runDiagnosis = 'Run diagnosis';
+  static const String diagnosisResultTitle = 'Diagnosis result';
+  static const String diseaseName = 'Disease';
+  static const String confidence = 'Confidence';
+  static const String confidenceHigh = 'High';
+  static const String confidenceMedium = 'Medium';
+  static const String confidenceLow = 'Low';
+  static const String cause = 'Cause';
+  static const String symptoms = 'Symptoms';
+  static const String treatmentChemical = 'Chemical treatment';
+  static const String treatmentOrganic = 'Organic alternative';
+  static const String dosage = 'Dosage and method';
+  static const String safetyPrecautions = 'Safety precautions';
+  static const String diagnoseEmptyState =
+      'Take or pick a photo to start. You can also describe symptoms instead.';
+  static const String diagnoseInputRequired =
+      'Add a photo or describe symptoms first.';
+  static const String diagnoseLowConfidenceAdvice =
+      'Confidence is low. Consider taking another photo or consulting a local agriculture officer.';
+  static const String selectCropForDiagnosis = 'Crop being diagnosed';
+  static const String autoSelectStage =
+      '(stage auto-selected from sowing date)';
+
+  // -- Market prices --
+  static const String marketTitle = 'Market prices';
+  static const String fetchPrices = 'Fetch latest prices';
+  static const String lastUpdated = 'Last updated';
+  static const String priceMandi = 'Mandi';
+  static const String priceModal = 'Modal';
+  static const String priceMin = 'Min';
+  static const String priceMax = 'Max';
+  static const String pricePerQuintal = '₹ per quintal';
+  static const String noPriceData = 'No price data yet. Tap refresh to fetch.';
+  static const String marketHelper =
+      'Live prices from data.gov.in AgMarknet. Requires an internet connection.';
+  static const String marketApiKeyMissing =
+      'AgMarknet API key not configured. Add DATA_GOV_IN_API_KEY to .env to enable live prices.';
+
+  // -- Government schemes --
+  static const String schemesTitle = 'Government schemes';
+  static const String eligibleBadge = 'Eligible';
+  static const String checkRequiredBadge = 'Check eligibility';
+  static const String benefitLabel = 'What you get';
+  static const String eligibilityLabel = 'Eligibility';
+  static const String howToApply = 'How to apply';
+  static const String openOfficialPortal = 'Open official portal';
+  static const String schemesSubtitle =
+      'Schemes you may be eligible for, based on your declared land size.';
+  static const String setLandAreaPrompt =
+      'Add land area in Settings to refine eligibility checks.';
 }

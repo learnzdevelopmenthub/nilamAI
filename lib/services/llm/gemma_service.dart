@@ -52,16 +52,19 @@ class GemmaService {
   final ConnectivityCheck? _connectivityCheck;
 
   /// Generates an English response for [query], optionally grounded with a
-  /// [cropContext] from a tracked crop profile.
+  /// [cropContext] from a tracked crop profile and [retrieved] knowledge
+  /// chunks from the BM25 retriever.
   Future<GemmaResponse> generate({
     required String query,
     String? cropType,
     CropContext? cropContext,
+    RetrievedContext? retrieved,
   }) async {
     final built = PromptBuilder.build(
       query: query,
       cropType: cropType,
       cropContext: cropContext,
+      retrieved: retrieved,
     );
 
     await _ensureOnline();

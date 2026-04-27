@@ -105,6 +105,7 @@ class _FakeGemmaNotifier extends GemmaNotifier {
     required String query,
     String? cropType,
     CropContext? cropContext,
+    RetrievedContext? retrieved,
   }) async {
     generateCalls += 1;
     lastQuery = query;

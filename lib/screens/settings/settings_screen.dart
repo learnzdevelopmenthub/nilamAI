@@ -5,6 +5,7 @@ import 'package:package_info_plus/package_info_plus.dart';
 import '../../core/constants/strings_tamil.dart';
 import '../../core/logging/logger.dart';
 import '../../providers/database_providers.dart';
+import '../../providers/feature_providers.dart';
 import '../../providers/settings_providers.dart';
 import '../../providers/user_providers.dart';
 
@@ -112,7 +113,22 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             SwitchListTile(
               title: const Text(TamilStrings.notificationsLabel),
               value: settings.notificationsEnabled,
-              onChanged: notifier.setNotificationsEnabled,
+              onChanged: (enabled) async {
+                await notifier.setNotificationsEnabled(enabled);
+                // Re-arm or cancel scheduled reminders. Best-effort.
+                try {
+                  final userId =
+                      await ref.read(currentUserIdProvider.future);
+                  await ref
+                      .read(cropReminderSchedulerProvider)
+                      .rescheduleAll(userId);
+                } catch (e, st) {
+                  AppLogger.warning(
+                    'Reschedule on toggle failed: $e\n$st',
+                    _tag,
+                  );
+                }
+              },
             ),
             const Divider(height: 1),
             Padding(

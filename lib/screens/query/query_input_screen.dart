@@ -14,6 +14,7 @@ import '../../providers/user_providers.dart';
 import '../../services/database/models/crop_profile.dart';
 import '../../services/database/models/query_history.dart';
 import '../../services/llm/prompt_builder.dart';
+import '../../services/retrieval/knowledge_chunk.dart';
 
 /// English text-input screen that feeds the LLM. When [cropProfileId] is
 /// supplied, the prompt is grounded with that crop's current stage and
@@ -45,7 +46,8 @@ class _QueryInputScreenState extends ConsumerState<QueryInputScreen> {
     super.dispose();
   }
 
-  Future<CropContext?> _resolveContext() async {
+  Future<({CropContext context, String cropId, String stageId})?>
+      _resolveContext() async {
     final cropProfileId = widget.cropProfileId;
     if (cropProfileId == null) return null;
     try {
@@ -58,7 +60,7 @@ class _QueryInputScreenState extends ConsumerState<QueryInputScreen> {
       if (tpl == null) return null;
       final daysSince = crop.daysSinceSowing();
       final stage = tpl.stageForDay(daysSince);
-      return CropContext(
+      final ctx = CropContext(
         cropName: tpl.name,
         variety: crop.variety,
         stageName: stage.name,
@@ -68,6 +70,7 @@ class _QueryInputScreenState extends ConsumerState<QueryInputScreen> {
         commonDiseases: stage.commonDiseases,
         recommendedFertilizer: stage.recommendedFertilizer,
       );
+      return (context: ctx, cropId: crop.cropId, stageId: stage.id);
     } catch (e, st) {
       AppLogger.warning(
         'Failed to build crop context for $cropProfileId: $e\n$st',
@@ -86,9 +89,26 @@ class _QueryInputScreenState extends ConsumerState<QueryInputScreen> {
     try {
       final dao = ref.read(queryHistoryDaoProvider);
       final userId = await ref.read(currentUserIdProvider.future);
-      final cropContext = await _resolveContext();
-      final now = DateTime.now();
+      final resolved = await _resolveContext();
+      final cropContext = resolved?.context;
 
+      // Sparse retrieval over crops.json + diseases.json, scoped to the
+      // tracked crop+stage when available so off-topic chunks don't leak in.
+      List<KnowledgeChunk> chunks = const [];
+      try {
+        final ranked = await ref.read(knowledgeRetrieverProvider).retrieve(
+              query: text,
+              cropId: resolved?.cropId,
+              stageId: resolved?.stageId,
+              topK: 4,
+            );
+        chunks = ranked.map((r) => r.chunk).toList(growable: false);
+      } catch (e, st) {
+        AppLogger.warning('Retrieval failed; continuing without RAG: $e\n$st',
+            _tag);
+      }
+
+      final now = DateTime.now();
       final history = QueryHistory(
         id: const Uuid().v4(),
         userId: userId,
@@ -108,6 +128,9 @@ class _QueryInputScreenState extends ConsumerState<QueryInputScreen> {
         query: text,
         cropContext: cropContext,
         cropType: cropContext?.cropName,
+        retrieved: chunks.isEmpty
+            ? null
+            : RetrievedContext(chunks: chunks),
       ));
 
       if (!mounted) return;

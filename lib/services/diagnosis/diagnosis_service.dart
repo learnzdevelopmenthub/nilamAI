@@ -2,6 +2,8 @@ import '../../core/exceptions/app_exception.dart';
 import '../../core/logging/logger.dart';
 import '../llm/gemma_service.dart';
 import '../llm/llm_constants.dart';
+import '../llm/prompt_builder.dart';
+import '../retrieval/knowledge_chunk.dart';
 import 'diagnosis_models.dart';
 import 'diagnosis_parser.dart';
 import 'diagnosis_prompt.dart';
@@ -18,18 +20,29 @@ class DiagnosisService {
 
   final GemmaService _gemma;
 
-  Future<DiagnosisResult> diagnose(DiagnosisRequest req) async {
+  Future<DiagnosisResult> diagnose(
+    DiagnosisRequest req, {
+    List<KnowledgeChunk> retrievedChunks = const [],
+  }) async {
     if (!req.isValid) {
       throw LlmException.invalidQuery(
         'Add a photo or describe symptoms to run a diagnosis.',
       );
     }
 
-    final prompt = DiagnosisPrompt.fullPrompt(req);
+    final basePrompt = DiagnosisPrompt.fullPrompt(req);
+    final retrieved = retrievedChunks.isEmpty
+        ? null
+        : RetrievedContext(chunks: retrievedChunks);
+    final prompt = retrieved == null
+        ? basePrompt
+        : '$basePrompt\n\n${retrieved.render()}';
+
     final useVision =
         LlmConstants.deepInfraVisionCapable && req.hasImage;
     AppLogger.info(
-      'Running diagnosis (vision=$useVision, hasSymptoms=${req.hasSymptoms})',
+      'Running diagnosis (vision=$useVision, hasSymptoms=${req.hasSymptoms}, '
+      'chunks=${retrievedChunks.length})',
       _tag,
     );
 

@@ -5,8 +5,8 @@ import 'package:nilam_ai/providers/llm_providers.dart';
 import 'package:nilam_ai/services/llm/gemma_generator.dart';
 import 'package:nilam_ai/services/llm/model_loader.dart';
 
-class _FakeGenerator implements GemmaGenerator {
-  _FakeGenerator({this.text = 'தமிழ் பதில்.'});
+class _FakeGenerator extends GemmaGenerator {
+  _FakeGenerator({this.text = 'English answer.'});
 
   final String text;
 
@@ -49,7 +49,7 @@ void main() {
         overrides: [
           gemmaModelLoaderProvider.overrideWithValue(_FakeLoader()),
           gemmaGeneratorProvider.overrideWithValue(
-            _FakeGenerator(text: 'சுத்தமான பதில்.'),
+            _FakeGenerator(text: 'Clean answer.'),
           ),
           connectivityCheckProvider.overrideWithValue(null),
         ],
@@ -64,7 +64,7 @@ void main() {
 
       await container
           .read(gemmaNotifierProvider.notifier)
-          .generate(query: 'q', cropType: 'நெல்');
+          .generate(query: 'q', cropType: 'rice');
 
       expect(states.first, isA<GemmaIdle>());
       expect(states.any((s) => s is GemmaLoadingModel), isTrue);
@@ -72,9 +72,9 @@ void main() {
       expect(states.last, isA<GemmaComplete>());
 
       final complete = states.last as GemmaComplete;
-      expect(complete.response.text, equals('சுத்தமான பதில்.'));
-      expect(complete.response.prompt, contains('கேள்வி: q'));
-      expect(complete.response.prompt, contains('பயிர்: நெல்'));
+      expect(complete.response.text, equals('Clean answer.'));
+      expect(complete.response.prompt, contains('Farmer question: q'));
+      expect(complete.response.prompt, contains('Crop is rice.'));
     });
 
     test('model-load failure surfaces GemmaError with E009', () async {

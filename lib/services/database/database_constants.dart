@@ -3,11 +3,14 @@ class DatabaseConstants {
   DatabaseConstants._();
 
   static const String databaseName = 'nilam_ai.db';
-  static const int databaseVersion = 1;
+
+  /// v2 added the `crop_profile` table for multi-crop tracking (FR-3.1).
+  static const int databaseVersion = 2;
 
   // -- Table names --
   static const String tableUserProfile = 'user_profile';
   static const String tableQueryHistory = 'query_history';
+  static const String tableCropProfile = 'crop_profile';
 
   // -- SQL: Create tables --
 
@@ -45,8 +48,28 @@ class DatabaseConstants {
     )
   ''';
 
+  static const String createCropProfile = '''
+    CREATE TABLE $tableCropProfile (
+      id TEXT PRIMARY KEY,
+      user_id TEXT NOT NULL,
+      crop_id TEXT NOT NULL,
+      variety TEXT,
+      sowing_date INTEGER NOT NULL,
+      land_area_acres REAL,
+      soil_type TEXT,
+      irrigation_type TEXT,
+      status TEXT NOT NULL DEFAULT 'active',
+      created_at INTEGER NOT NULL,
+      updated_at INTEGER NOT NULL,
+      FOREIGN KEY (user_id) REFERENCES $tableUserProfile(id)
+    )
+  ''';
+
   // -- SQL: Create indexes --
 
   static const String createIndexQueryUserDate =
       'CREATE INDEX idx_query_user_date ON $tableQueryHistory(user_id, timestamp DESC)';
+
+  static const String createIndexCropProfileUser =
+      'CREATE INDEX idx_crop_profile_user ON $tableCropProfile(user_id, status)';
 }

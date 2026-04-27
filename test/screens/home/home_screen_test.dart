@@ -16,10 +16,10 @@ GoRouter _router(List<String> visited) => GoRouter(
       routes: [
         GoRoute(path: '/', builder: (_, _) => const HomeScreen()),
         GoRoute(
-          path: '/record',
+          path: '/ask',
           builder: (_, _) {
-            visited.add('/record');
-            return const Scaffold(body: Text('RECORD_SCREEN'));
+            visited.add('/ask');
+            return const Scaffold(body: Text('ASK_SCREEN'));
           },
         ),
         GoRoute(
@@ -144,7 +144,7 @@ void main() {
       expect(find.text('மண் வளம்'), findsOneWidget);
     });
 
-    testWidgets('tapping CTA navigates to /record', (tester) async {
+    testWidgets('tapping CTA navigates to /ask', (tester) async {
       final visited = <String>[];
       await tester.pumpWidget(_app(db: db, router: _router(visited)));
       await _settle(tester);
@@ -152,7 +152,7 @@ void main() {
       await tester.tap(find.text(TamilStrings.askQuestionCta));
       await _settle(tester);
 
-      expect(visited, contains('/record'));
+      expect(visited, contains('/ask'));
     });
 
     testWidgets('tapping settings icon navigates to /settings',

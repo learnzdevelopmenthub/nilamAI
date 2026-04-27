@@ -34,5 +34,27 @@ class LlmConstants {
   }
 
   // -- Language --
-  static const String language = 'ta';
+  static const String language = 'en';
+
+  // -- Vision (multimodal) --
+  /// Whether the configured DeepInfra model accepts image inputs. Gemma 4
+  /// MoE on DeepInfra is multimodal; flip to false if a future model swap
+  /// drops vision support.
+  static const bool deepInfraVisionCapable = true;
+
+  // -- Market prices (data.gov.in OGD AgMarknet) --
+  static const String agMarknetBaseUrl = 'https://api.data.gov.in';
+  static const String agMarknetResourceId =
+      '9ef84268-d588-465a-a308-a864a43d0070';
+
+  /// Loaded from `.env` at app start. Falls back to `--dart-define`.
+  /// Free key: register at https://data.gov.in to get one.
+  static String get agMarknetApiKey {
+    final fromDotenv = dotenv.maybeGet('DATA_GOV_IN_API_KEY') ?? '';
+    if (fromDotenv.isNotEmpty) return fromDotenv;
+    return const String.fromEnvironment(
+      'DATA_GOV_IN_API_KEY',
+      defaultValue: '',
+    );
+  }
 }

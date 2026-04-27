@@ -12,17 +12,10 @@ import 'response_post_processor.dart';
 
 /// Async connectivity probe; returns the current transports (wifi, mobile,
 /// ethernet, vpn, or none). Injected so tests can run without the real
-/// connectivity plugin. Null means "skip the check" — used by existing
-/// tests that predate the remote (API) backend.
+/// connectivity plugin. Null means "skip the check".
 typedef ConnectivityCheck = Future<List<ConnectivityResult>> Function();
 
 /// Outcome of a successful Gemma inference.
-///
-/// [text] is the post-processed Tamil response ready for TTS and UI.
-/// [rawText] is the untouched model output (kept for diagnostics).
-/// [prompt] is the assembled prompt — persist to `QueryHistory.gemmaPrompt`.
-/// [latencyMs] is wall-clock inference time — persist to
-/// `QueryHistory.gemmaLatencyMs`.
 class GemmaResponse {
   const GemmaResponse({
     required this.text,
@@ -37,8 +30,8 @@ class GemmaResponse {
   final int latencyMs;
 }
 
-/// High-level service that turns a Tamil query + optional crop context into
-/// a post-processed Tamil response using Gemma 4 E2B on-device.
+/// High-level service that turns an English query + optional crop context
+/// into a post-processed English response using Gemma 4 via DeepInfra.
 ///
 /// Deliberately DB-free: the caller is responsible for persisting the
 /// [GemmaResponse] fields to `QueryHistory` and invalidating the Riverpod
@@ -58,37 +51,21 @@ class GemmaService {
   final GemmaGenerator _generator;
   final ConnectivityCheck? _connectivityCheck;
 
-  /// Generates a Tamil response for [query], optionally contextualized with
-  /// [cropType] from the user profile.
-  ///
-  /// Error handling (SRS §10.3):
-  /// - [LlmException.invalidQuery] (E012) — empty/whitespace query
-  /// - [LlmException.networkOffline] (E013) — device offline in API mode
-  /// - [LlmException.modelNotLoaded] (E009) — model asset missing or I/O error
-  /// - [LlmException.inferenceTimeout] (E010) — >30 s without a response
-  /// - [LlmException.outOfMemory] (E011) — OOM during inference
+  /// Generates an English response for [query], optionally grounded with a
+  /// [cropContext] from a tracked crop profile.
   Future<GemmaResponse> generate({
     required String query,
     String? cropType,
+    CropContext? cropContext,
   }) async {
-    // PromptBuilder throws E012 on empty/whitespace.
-    final built = PromptBuilder.build(query: query, cropType: cropType);
+    final built = PromptBuilder.build(
+      query: query,
+      cropType: cropType,
+      cropContext: cropContext,
+    );
 
-    if (_connectivityCheck != null) {
-      final status = await _connectivityCheck();
-      if (status.every((c) => c == ConnectivityResult.none)) {
-        throw LlmException.networkOffline();
-      }
-    }
-
-    final String modelPath;
-    try {
-      modelPath = await _loader.ensureModelAvailable();
-    } on LlmException {
-      rethrow;
-    } catch (e) {
-      throw LlmException.modelNotLoaded(originalError: e);
-    }
+    await _ensureOnline();
+    final modelPath = await _loadModel();
 
     final stopwatch = Stopwatch()..start();
     try {
@@ -107,7 +84,6 @@ class GemmaService {
         'Gemma inference complete in ${stopwatch.elapsedMilliseconds} ms',
         _tag,
       );
-
       return GemmaResponse(
         text: ResponsePostProcessor.process(raw),
         rawText: raw,
@@ -128,6 +104,77 @@ class GemmaService {
         message: 'Gemma inference failed: $e',
         originalError: e,
       );
+    }
+  }
+
+  /// Generates a multimodal response (image + text). Used by the disease
+  /// diagnosis flow.
+  Future<GemmaResponse> generateWithImage({
+    required String prompt,
+    required List<int> imageBytes,
+    String mimeType = 'image/jpeg',
+    int? maxTokens,
+    double? temperature,
+  }) async {
+    if (prompt.trim().isEmpty) {
+      throw LlmException.invalidQuery('prompt is empty');
+    }
+    await _ensureOnline();
+    final modelPath = await _loadModel();
+
+    final stopwatch = Stopwatch()..start();
+    try {
+      final raw = await _generator
+          .generateWithImage(
+            modelPath: modelPath,
+            prompt: prompt,
+            imageBytes: imageBytes,
+            mimeType: mimeType,
+            maxTokens: maxTokens ?? LlmConstants.maxOutputTokens,
+            temperature: temperature ?? LlmConstants.temperature,
+          )
+          .timeout(
+            const Duration(seconds: LlmConstants.inferenceTimeoutSeconds),
+          );
+      stopwatch.stop();
+      AppLogger.info(
+        'Gemma vision inference complete in ${stopwatch.elapsedMilliseconds} ms',
+        _tag,
+      );
+      return GemmaResponse(
+        text: ResponsePostProcessor.process(raw),
+        rawText: raw,
+        prompt: prompt,
+        latencyMs: stopwatch.elapsedMilliseconds,
+      );
+    } on TimeoutException catch (e) {
+      throw LlmException.inferenceTimeout(originalError: e);
+    } on LlmException {
+      rethrow;
+    } catch (e, s) {
+      AppLogger.error('Gemma vision inference failed', _tag, e, s);
+      throw LlmException(
+        message: 'Gemma vision inference failed: $e',
+        originalError: e,
+      );
+    }
+  }
+
+  Future<void> _ensureOnline() async {
+    if (_connectivityCheck == null) return;
+    final status = await _connectivityCheck();
+    if (status.every((c) => c == ConnectivityResult.none)) {
+      throw LlmException.networkOffline();
+    }
+  }
+
+  Future<String> _loadModel() async {
+    try {
+      return await _loader.ensureModelAvailable();
+    } on LlmException {
+      rethrow;
+    } catch (e) {
+      throw LlmException.modelNotLoaded(originalError: e);
     }
   }
 }

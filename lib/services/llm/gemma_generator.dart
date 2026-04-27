@@ -10,4 +10,22 @@ abstract class GemmaGenerator {
     required int maxTokens,
     required double temperature,
   });
+
+  /// Multimodal variant: send a prompt plus one image (raw bytes — encoded
+  /// as a `data:image/jpeg;base64,…` URL by the implementation).
+  ///
+  /// Defaults to throwing so existing fakes keep compiling; callers should
+  /// only invoke this on backends that advertise vision support.
+  Future<String> generateWithImage({
+    required String modelPath,
+    required String prompt,
+    required List<int> imageBytes,
+    String mimeType = 'image/jpeg',
+    required int maxTokens,
+    required double temperature,
+  }) {
+    throw UnimplementedError(
+      'generateWithImage not supported by this backend',
+    );
+  }
 }

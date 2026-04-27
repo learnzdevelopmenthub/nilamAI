@@ -9,6 +9,7 @@ import '../services/llm/gemma_service.dart';
 import '../services/llm/llm_constants.dart';
 import '../services/llm/model_loader.dart';
 import '../services/llm/noop_model_loader.dart';
+import '../services/llm/prompt_builder.dart';
 
 // -----------------------------------------------------------------------------
 // Sealed Gemma state
@@ -96,7 +97,11 @@ class GemmaNotifier extends Notifier<GemmaState> {
   GemmaService get _service => ref.read(gemmaServiceProvider);
 
   /// Kicks off a full inference: LoadingModel → Generating → Complete/Error.
-  Future<void> generate({required String query, String? cropType}) async {
+  Future<void> generate({
+    required String query,
+    String? cropType,
+    CropContext? cropContext,
+  }) async {
     state = const GemmaLoadingModel();
     AppLogger.info('Gemma generation started', _tag);
 
@@ -108,6 +113,7 @@ class GemmaNotifier extends Notifier<GemmaState> {
       final response = await _service.generate(
         query: query,
         cropType: cropType,
+        cropContext: cropContext,
       );
       state = GemmaComplete(response: response);
       AppLogger.info(

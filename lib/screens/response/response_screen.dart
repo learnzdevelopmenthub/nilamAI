@@ -8,7 +8,9 @@ import '../../config/theme.dart';
 import '../../core/constants/strings_tamil.dart';
 import '../../core/logging/logger.dart';
 import '../../providers/database_providers.dart';
+import '../../providers/feature_providers.dart';
 import '../../providers/llm_providers.dart';
+import '../../providers/settings_providers.dart';
 import '../../services/database/models/query_history.dart';
 import '../../services/llm/gemma_service.dart';
 
@@ -220,7 +222,7 @@ class _ResponseBodyState extends ConsumerState<_ResponseBody> {
             ),
           ),
           const SizedBox(height: 12),
-          _AudioControls(),
+          _AudioControls(textToSpeak: hasStored ? stored : null),
           const SizedBox(height: 16),
           Row(
             children: [
@@ -406,47 +408,69 @@ class _GemmaError extends StatelessWidget {
   }
 }
 
-// TODO(#16): Phase 7 (#7) wires real TTS — replace `onPressed: null` with
-// play/pause handlers, swap the static "1.0x" label for a Dropdown bound to
-// `settingsProvider.ttsSpeed`, and drop the `audioComingSoon` caption.
-class _AudioControls extends StatelessWidget {
+/// TTS controls bound to [ttsServiceProvider] and [settingsProvider]. Play
+/// is disabled until [textToSpeak] is non-empty (i.e. a stored response is
+/// available). Stop disposes the in-flight utterance.
+class _AudioControls extends ConsumerStatefulWidget {
+  const _AudioControls({required this.textToSpeak});
+
+  final String? textToSpeak;
+
+  @override
+  ConsumerState<_AudioControls> createState() => _AudioControlsState();
+}
+
+class _AudioControlsState extends ConsumerState<_AudioControls> {
+  bool _speaking = false;
+
+  Future<void> _speak() async {
+    final text = widget.textToSpeak;
+    if (text == null || text.trim().isEmpty || _speaking) return;
+    final tts = ref.read(ttsServiceProvider);
+    final speed = ref.read(settingsProvider).ttsSpeed;
+    setState(() => _speaking = true);
+    try {
+      await tts.speak(text, speed: speed);
+    } finally {
+      if (mounted) setState(() => _speaking = false);
+    }
+  }
+
+  Future<void> _stop() async {
+    final tts = ref.read(ttsServiceProvider);
+    await tts.stop();
+    if (mounted) setState(() => _speaking = false);
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final speed = ref.watch(settingsProvider).ttsSpeed;
+    final canPlay =
+        (widget.textToSpeak ?? '').trim().isNotEmpty && !_speaking;
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(12),
-        child: Column(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                IconButton(
-                  tooltip: TamilStrings.play,
-                  onPressed: null,
-                  iconSize: 36,
-                  icon: const Icon(Icons.play_arrow),
-                ),
-                const SizedBox(width: 8),
-                IconButton(
-                  tooltip: TamilStrings.stop,
-                  onPressed: null,
-                  iconSize: 36,
-                  icon: const Icon(Icons.pause),
-                ),
-                const SizedBox(width: 16),
-                Text(
-                  '${TamilStrings.playSpeed}: 1.0x',
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
-                  ),
-                ),
-              ],
+            IconButton(
+              tooltip: TamilStrings.play,
+              onPressed: canPlay ? _speak : null,
+              iconSize: 36,
+              icon: const Icon(Icons.play_arrow),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(width: 8),
+            IconButton(
+              tooltip: TamilStrings.stop,
+              onPressed: _speaking ? _stop : null,
+              iconSize: 36,
+              icon: const Icon(Icons.stop),
+            ),
+            const SizedBox(width: 16),
             Text(
-              TamilStrings.audioComingSoon,
-              style: theme.textTheme.bodySmall?.copyWith(
+              '${TamilStrings.playSpeed}: ${speed.toStringAsFixed(1)}x',
+              style: theme.textTheme.bodyMedium?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),
             ),

@@ -15,6 +15,10 @@ import 'llm_constants.dart';
 /// Implements the [GemmaGenerator] contract so callers (`GemmaService`,
 /// providers, the UI state machine) are unchanged. The `modelPath` argument
 /// is ignored; DeepInfra hosts the model.
+///
+/// Both text-only and multimodal requests go through [_post]; the only
+/// difference is the shape of `messages[].content` (a string vs. a list
+/// of parts).
 class DeepInfraGenerator implements GemmaGenerator {
   DeepInfraGenerator({
     required this.apiKey,
@@ -38,13 +42,53 @@ class DeepInfraGenerator implements GemmaGenerator {
     required String prompt,
     required int maxTokens,
     required double temperature,
+  }) {
+    return _post(
+      messages: [
+        {'role': 'user', 'content': prompt},
+      ],
+      maxTokens: maxTokens,
+      temperature: temperature,
+    );
+  }
+
+  @override
+  Future<String> generateWithImage({
+    required String modelPath,
+    required String prompt,
+    required List<int> imageBytes,
+    String mimeType = 'image/jpeg',
+    required int maxTokens,
+    required double temperature,
+  }) {
+    final dataUrl = 'data:$mimeType;base64,${base64Encode(imageBytes)}';
+    return _post(
+      messages: [
+        {
+          'role': 'user',
+          'content': [
+            {
+              'type': 'image_url',
+              'image_url': {'url': dataUrl},
+            },
+            {'type': 'text', 'text': prompt},
+          ],
+        },
+      ],
+      maxTokens: maxTokens,
+      temperature: temperature,
+    );
+  }
+
+  Future<String> _post({
+    required List<Map<String, dynamic>> messages,
+    required int maxTokens,
+    required double temperature,
   }) async {
     final uri = Uri.parse(baseUrl);
     final body = jsonEncode({
       'model': model,
-      'messages': [
-        {'role': 'user', 'content': prompt},
-      ],
+      'messages': messages,
       'max_tokens': maxTokens,
       'temperature': temperature,
     });
@@ -83,7 +127,6 @@ class DeepInfraGenerator implements GemmaGenerator {
       );
     }
 
-    // Decode as UTF-8 directly so Tamil round-trips correctly.
     final Map<String, dynamic> decoded;
     try {
       decoded = jsonDecode(utf8.decode(response.bodyBytes))

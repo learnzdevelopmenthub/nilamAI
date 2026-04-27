@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../screens/crops/add_crop_screen.dart';
+import '../screens/crops/crop_detail_screen.dart';
+import '../screens/diagnose/diagnose_screen.dart';
 import '../screens/history/history_screen.dart';
-import '../screens/home/home_screen.dart';
-import '../screens/recording/recording_screen.dart';
+import '../screens/main_scaffold.dart';
+import '../screens/query/query_input_screen.dart';
 import '../screens/response/response_screen.dart';
 import '../screens/settings/settings_screen.dart';
-import '../screens/transcription/transcribing_screen.dart';
-import '../screens/transcription/transcription_review_screen.dart';
 
 final GoRouter appRouter = GoRouter(
   initialLocation: '/',
@@ -16,34 +17,15 @@ final GoRouter appRouter = GoRouter(
       path: '/',
       name: 'home',
       builder: (BuildContext context, GoRouterState state) {
-        return const HomeScreen();
+        return const MainScaffold();
       },
     ),
     GoRoute(
-      path: '/record',
-      name: 'record',
+      path: '/ask',
+      name: 'ask',
       builder: (BuildContext context, GoRouterState state) {
-        return const RecordingScreen();
-      },
-    ),
-    GoRoute(
-      path: '/transcribe',
-      name: 'transcribe',
-      builder: (BuildContext context, GoRouterState state) {
-        final audioPath = state.uri.queryParameters['audioPath'] ?? '';
-        return TranscribingScreen(audioPath: audioPath);
-      },
-    ),
-    GoRoute(
-      path: '/review',
-      name: 'review',
-      builder: (BuildContext context, GoRouterState state) {
-        final audioPath = state.uri.queryParameters['audioPath'] ?? '';
-        final initialText = state.uri.queryParameters['text'] ?? '';
-        return TranscriptionReviewScreen(
-          audioPath: audioPath,
-          initialText: initialText,
-        );
+        final cropId = state.uri.queryParameters['cropId'];
+        return QueryInputScreen(cropProfileId: cropId);
       },
     ),
     GoRoute(
@@ -67,6 +49,31 @@ final GoRouter appRouter = GoRouter(
       name: 'settings',
       builder: (BuildContext context, GoRouterState state) {
         return const SettingsScreen();
+      },
+    ),
+    GoRoute(
+      path: '/crops/add',
+      name: 'crops-add',
+      builder: (BuildContext context, GoRouterState state) {
+        return const AddCropScreen();
+      },
+    ),
+    GoRoute(
+      path: '/crops/:cropId',
+      name: 'crop-detail',
+      builder: (BuildContext context, GoRouterState state) {
+        return CropDetailScreen(
+          cropProfileId: state.pathParameters['cropId']!,
+        );
+      },
+    ),
+    GoRoute(
+      path: '/diagnose',
+      name: 'diagnose-pushed',
+      builder: (BuildContext context, GoRouterState state) {
+        return DiagnoseScreen(
+          preselectedCropProfileId: state.uri.queryParameters['cropId'],
+        );
       },
     ),
   ],

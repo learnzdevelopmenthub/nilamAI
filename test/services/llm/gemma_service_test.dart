@@ -5,9 +5,9 @@ import 'package:nilam_ai/services/llm/gemma_service.dart';
 import 'package:nilam_ai/services/llm/llm_constants.dart';
 import 'package:nilam_ai/services/llm/model_loader.dart';
 
-class _FakeGenerator implements GemmaGenerator {
+class _FakeGenerator extends GemmaGenerator {
   _FakeGenerator({
-    this.text = 'தமிழ் பதில்.',
+    this.text = 'English answer.',
     this.error,
     this.delay = Duration.zero,
   });
@@ -64,16 +64,16 @@ class _FakeLoader implements ModelLoader {
 void main() {
   group('GemmaService.generate — happy path', () {
     test('returns post-processed text, raw text, prompt, and latency', () async {
-      final gen = _FakeGenerator(text: '**5 kg** விதை போடு.');
+      final gen = _FakeGenerator(text: '**Apply 5 kg** of seed.');
       final svc = GemmaService(loader: _FakeLoader(), generator: gen);
 
-      final result = await svc.generate(query: 'query', cropType: 'நெல்');
+      final result = await svc.generate(query: 'query', cropType: 'rice');
 
-      expect(result.rawText, equals('**5 kg** விதை போடு.'));
-      // Post-processor strips bold and expands kg.
-      expect(result.text, equals('5 கிலோ விதை போடு.'));
-      expect(result.prompt, contains('கேள்வி: query'));
-      expect(result.prompt, contains('பயிர்: நெல்'));
+      expect(result.rawText, equals('**Apply 5 kg** of seed.'));
+      // Post-processor strips bold markers.
+      expect(result.text, equals('Apply 5 kg of seed.'));
+      expect(result.prompt, contains('Farmer question: query'));
+      expect(result.prompt, contains('Crop is rice.'));
       expect(result.latencyMs, greaterThanOrEqualTo(0));
     });
 
@@ -105,7 +105,7 @@ void main() {
 
       await svc.generate(query: 'q');
 
-      expect(gen.lastPrompt!.contains('பயிர்:'), isFalse);
+      expect(gen.lastPrompt!.contains('Crop is'), isFalse);
     });
   });
 
